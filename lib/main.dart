@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:gim_app/Binding/authBinding.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
 import 'package:gim_app/auth/login_screen.dart';
-import 'package:gim_app/controllers/userController.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

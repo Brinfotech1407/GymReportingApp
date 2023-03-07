@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
-import 'package:gim_app/auth/regisration.dart';
-import 'package:gim_app/gym_utiles.dart';
+import 'package:gim_app/auth/registration.dart';
+import 'package:gim_app/gym_utils.dart';
 import 'package:gim_app/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {

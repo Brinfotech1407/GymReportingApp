@@ -2,13 +2,18 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gim_app/models/user.dart';
+import 'package:gim_app/services/preference_service.dart';
 
 class Database {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final PreferenceService _preferenceService = PreferenceService();
+
 
   Future<String> createNewUser(Map<String, dynamic>? userData,
       String Uid) async {
     if (userData != null) {
+      await _preferenceService.init();
+      await _preferenceService.setUserEmail(Uid);
       try {
         await _firestore.collection("users").doc(Uid).set(userData,
             SetOptions(

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
-import 'package:gim_app/auth/registration.dart';
 import 'package:gim_app/gym_utils.dart';
 import 'package:gim_app/home_screen.dart';
 
@@ -63,12 +62,19 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ],
               ),
-              mobileNumberFormFiledView(),
+              emailFormFiledView(),
               passwordFormFiledView(),
-             GymUtils().buildButtonView(context: context, onSubmitBtnTap:() {
-            AuthController.instance.register(_emailController.text, _pwdController.text);
-               Get.to(const RegistrationScreen());
-             },buttonName: 'Login')
+              GymUtils().buildButtonView(
+                  context: context,
+                  onSubmitBtnTap: () async {
+                      if (_emailController.text.isNotEmpty && _pwdController.text.isNotEmpty) {
+                            await AuthController.instance.register(
+                                _emailController.text, _pwdController.text,context);
+                            Get.to(() => const HomeScreen());
+
+                        }
+                  },
+                  buttonName: 'Login')
             ],
           ),
         ),
@@ -76,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget mobileNumberFormFiledView() {
+  Widget emailFormFiledView() {
     return Padding(
       padding: const EdgeInsets.only(left: 15, right: 15, top: 20),
       child: Form(
@@ -87,9 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
           cursorColor: Colors.black,
           decoration: InputDecoration(
               hintText: 'Enter Email number',
-              hintStyle: const TextStyle(
-                  fontSize: 14
-              ),
+              hintStyle: const TextStyle(fontSize: 14),
               focusColor: Colors.black,
               fillColor: Colors.grey.shade100,
               filled: true,
@@ -114,7 +118,21 @@ class _LoginScreenState extends State<LoginScreen> {
               disabledBorder: const OutlineInputBorder()),
           keyboardType: TextInputType.emailAddress,
           validator: (String? value) {
+            const pattern =
+                r"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'"
+                r'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-'
+                r'\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*'
+                r'[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4]'
+                r'[0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9]'
+                r'[0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\'
+                r'x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])';
 
+            RegExp regex = RegExp(pattern.toString());
+            if (!regex.hasMatch(value!)) {
+              return 'Enter a valid email id';
+            } else {
+              return null;
+            }
           },
         ),
       ),
@@ -133,9 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
           cursorColor: Colors.black,
           decoration: InputDecoration(
               hintText: 'Enter Password',
-              hintStyle: const TextStyle(
-                fontSize: 14
-              ),
+              hintStyle: const TextStyle(fontSize: 14),
               focusColor: Colors.black,
               fillColor: Colors.grey.shade100,
               filled: true,
@@ -143,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
               border: const OutlineInputBorder(
                 borderSide: BorderSide(width: 1, color: Colors.grey),
               ),
-              focusedBorder:  OutlineInputBorder(
+              focusedBorder: OutlineInputBorder(
                 borderSide: const BorderSide(
                   color: Colors.grey,
                   width: 2.0,
@@ -164,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 r'^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$';
             RegExp regex = RegExp(pattern.toString());
             if (!regex.hasMatch(value!)) {
-              return 'Enter a valid phone number';
+              return 'Enter a valid Password';
             } else {
               return null;
             }

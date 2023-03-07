@@ -49,6 +49,7 @@ dependencies:
   json_annotation: ^4.8.0
   #unique id provide
   uuid: ^3.0.7
+  quickalert: ^1.0.1
 
 
 dev_dependencies:

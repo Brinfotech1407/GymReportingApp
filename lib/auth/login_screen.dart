@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gim_app/auth/registration.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
 import 'package:gim_app/gym_utils.dart';
 import 'package:gim_app/home_screen.dart';
@@ -67,14 +68,35 @@ class _LoginScreenState extends State<LoginScreen> {
               GymUtils().buildButtonView(
                   context: context,
                   onSubmitBtnTap: () async {
-                      if (_emailController.text.isNotEmpty && _pwdController.text.isNotEmpty) {
-                            await AuthController.instance.register(
-                                _emailController.text, _pwdController.text,context);
-                            Get.to(() => const HomeScreen());
-
-                        }
+                    if (_emailController.text.isNotEmpty &&
+                        _pwdController.text.isNotEmpty) {
+                      await AuthController.instance.register(
+                          _emailController.text, _pwdController.text, context);
+                      Get.to(() => const HomeScreen());
+                    }
                   },
-                  buttonName: 'Login')
+                  buttonName: 'Login'),
+              Padding (
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Don't have an account yet? ",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Get.to(() => const RegistrationScreen());
+                      },
+                      child: const Text(
+                        "Register",
+                        style: TextStyle(color: Colors.green),
+                      ),
+                    ),
+                  ],
+                ),
+              )
             ],
           ),
         ),
@@ -118,8 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
               disabledBorder: const OutlineInputBorder()),
           keyboardType: TextInputType.emailAddress,
           validator: (String? value) {
-            const pattern =
-                r"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'"
+            const pattern = r"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'"
                 r'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-'
                 r'\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*'
                 r'[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4]'

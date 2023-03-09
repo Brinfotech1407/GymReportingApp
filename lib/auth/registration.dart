@@ -235,6 +235,27 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     }
                   },
                   buttonName: 'Register'),
+              Padding (
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Already have an account? ",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Get.to(() => const LoginScreen());
+                      },
+                      child: const Text(
+                        "log-in",
+                        style: TextStyle(color: Colors.green),
+                      ),
+                    ),
+                  ],
+                ),
+              )
             ],
           ),
         ),

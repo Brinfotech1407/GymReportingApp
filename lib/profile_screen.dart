@@ -1,35 +1,29 @@
 import 'package:flutter/material.dart';
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+class ProfileScreen extends StatefulWidget {
 
+  final String value;
+  final Function() screenClosed;
+  const ProfileScreen({
+    Key? key,
+    required this.value,
+    required this.screenClosed,
+  }) : super(key: key);
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: const Text('Profile'),
         ),
-        body: const Center(
-          child: Text('This is the Profile screen.'),
+        body:  Center(
+          child: Text('This is the Profile screen. ${widget.value}'),
         ),
-        bottomNavigationBar: BottomNavigationBar(
-            currentIndex: 2,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.fitness_center),
-                label: 'Workouts',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person),
-                label: 'Profile',
-              ),
-            ],
-            onTap: (index) {
-              if (index == 0) ;
-            }));
+    );
   }
 }

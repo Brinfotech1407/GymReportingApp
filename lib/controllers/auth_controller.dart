@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/auth/login_screen.dart';
 import 'package:gim_app/auth/registration.dart';
-import 'package:gim_app/home_screen.dart';
+import 'package:gim_app/scanner_screen.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 
@@ -29,9 +29,9 @@ class AuthController extends GetxController {
 
   _initialScreen(User? user) {
     if (user == null) {
-      Get.offAll(() => const RegistrationScreen());
+      Get.offAll(() => const LoginScreen());
     } else {
-      Get.off(() => const LoginScreen());
+      Get.off(() => const HomeScreen());
     }
   }
 

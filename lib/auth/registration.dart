@@ -192,7 +192,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           }).toList(),
                           onChanged: (int? newValue) {
                             dropdownValue.value = newValue!;
-                            print(dropdownValue.value);
                           },
                           value: dropdownValue.value,
                         ),
@@ -223,7 +222,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         memberShipPlan: dropdownValue.value,
                       );
                       await Database()
-                          .createNewUser(userData.toJson(), userData.email!);
+                          .createNewUser(userData.toJson(), userData.email!,context);
 
                       _emailController.clear();
                       _pwdController.clear();

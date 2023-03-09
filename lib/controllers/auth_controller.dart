@@ -53,7 +53,6 @@ class AuthController extends GetxController {
       }
 
       final userDoc = snapshot.docs.first;
-      print('userDoc ${userDoc.data()['email']}');
       // Check if the password matches
       if (userDoc.data()['password'] != password) {
         // Password does not match

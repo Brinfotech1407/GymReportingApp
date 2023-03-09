@@ -126,14 +126,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Colors.grey,
                   width: 2.0,
                 ),
-                borderRadius: BorderRadius.circular(50.0),
+                borderRadius: BorderRadius.circular(16),
               ),
               enabledBorder: OutlineInputBorder(
                 borderSide: const BorderSide(
                   color: Colors.grey,
                   width: 1.0,
                 ),
-                borderRadius: BorderRadius.circular(50.0),
+                borderRadius: BorderRadius.circular(16.0),
               ),
               disabledBorder: const OutlineInputBorder()),
           keyboardType: TextInputType.emailAddress,
@@ -185,14 +185,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Colors.grey,
                   width: 2.0,
                 ),
-                borderRadius: BorderRadius.circular(50.0),
+                borderRadius: BorderRadius.circular(16),
               ),
               enabledBorder: OutlineInputBorder(
                 borderSide: const BorderSide(
                   color: Colors.grey,
                   width: 1.0,
                 ),
-                borderRadius: BorderRadius.circular(50.0),
+                borderRadius: BorderRadius.circular(16),
               ),
               disabledBorder: const OutlineInputBorder()),
           keyboardType: TextInputType.phone,

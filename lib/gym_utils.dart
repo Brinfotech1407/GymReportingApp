@@ -79,12 +79,12 @@ class GymUtils {
                 color: Colors.grey,
                 width: 0.5,
               ),
-              borderRadius: BorderRadius.circular(50.0),
+              borderRadius: BorderRadius.circular(16.0),
             ),
             disabledBorder: const OutlineInputBorder()),
         keyboardType: keyboardType,
         validator: (String? value) {
-          validator(value);
+          return validator(value);
         },
       ),
     );

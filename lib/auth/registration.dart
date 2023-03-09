@@ -22,8 +22,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController _pwdController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final GenderController genderController = Get.put(GenderController());
-  String dropdownValue = '1';
-  var items = ['1', '2', '3', '4', '5', '6'];
+  RxInt dropdownValue = 1.obs;
+
+  var itemList = [1, 2, 3, 4, 5, 6].obs;
 
   @override
   Widget build(BuildContext context) {
@@ -173,26 +174,29 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         ),
                       ),
                     ),
-                    DropdownButton(
-                      value: dropdownValue,
-                      iconDisabledColor: Colors.white,
-                      iconEnabledColor: Colors.white,
-                      dropdownColor: Colors.blueGrey,
-                      icon: const Icon(Icons.keyboard_arrow_down),
-                      // Array list of items
-                      items: items.map((String items) {
-                        return DropdownMenuItem(
-                          value: items,
-                          child: Text(items,
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 14)),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          dropdownValue = newValue!;
-                        });
-                      },
+                    Obx(
+                      () => Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: DropdownButton<int>(
+                          iconDisabledColor: Colors.white,
+                          iconEnabledColor: Colors.white,
+                          dropdownColor: Colors.blueGrey,
+                          icon: const Icon(Icons.keyboard_arrow_down),
+                          items: itemList.map((int items) {
+                            return DropdownMenuItem(
+                              value: items,
+                              child: Text('$items Months',
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 14)),
+                            );
+                          }).toList(),
+                          onChanged: (int? newValue) {
+                            dropdownValue.value = newValue!;
+                            print(dropdownValue.value);
+                          },
+                          value: dropdownValue.value,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -216,7 +220,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         gender: genderController.gender.value,
                         lastName: _lastNameController.text,
                         password: _pwdController.text,
-                        memberShipPlan: 2,
+                        memberShipPlan: dropdownValue.value,
                       );
                       await Database()
                           .createNewUser(userData.toJson(), userData.email!);

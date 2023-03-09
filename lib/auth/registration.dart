@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/auth/login_screen.dart';
+import 'package:gim_app/controllers/gender_controller.dart';
 import 'package:gim_app/gym_utils.dart';
 import 'package:gim_app/models/user.dart';
 import 'package:gim_app/services/database.dart';
@@ -17,19 +18,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
-  final TextEditingController _genderController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  String dropdownValue = '1 Month';
-  var items = [
-    '1 Month',
-    '2 Month',
-    '3 Month',
-    '4 Month',
-    '5 Month',
-    '6 Month'
-  ];
+  final GenderController genderController = Get.put(GenderController());
+  String dropdownValue = '1';
+  var items = ['1', '2', '3', '4', '5', '6'];
 
   @override
   Widget build(BuildContext context) {
@@ -72,13 +66,48 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   isMaxLength: true,
                   validator: (value) {},
                   hintText: 'age'),
-              GymUtils().textFormFiledView(
-                  controller: _genderController,
-                  autofillHints: [AutofillHints.gender],
-                  textInputType: TextInputType.text,
-                  keyboardType: TextInputType.text,
-                  validator: (value) {},
-                  hintText: 'gender'),
+              const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 16, top: 8, right: 8),
+                    child: Text('Gender',
+                        style: TextStyle(
+                          color: Colors.white,
+                        )),
+                  )),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Obx(() {
+                      return RadioListTile(
+                        value: 'male',
+                        activeColor: Colors.white,
+                        title: const Text('Male',
+                            style: TextStyle(color: Colors.white)),
+                        groupValue: genderController.gender.value,
+                        onChanged: (value) {
+                          genderController.setGender(value!);
+                        },
+                      );
+                    }),
+                  ),
+                  Flexible(
+                    child: Obx(() {
+                      return RadioListTile(
+                        value: 'Female',
+                        activeColor: Colors.white,
+                        title: const Text('Female',
+                            style: TextStyle(color: Colors.white)),
+                        groupValue: genderController.gender.value,
+                        onChanged: (value) {
+                          genderController.setGender(value!);
+                        },
+                      );
+                    }),
+                  ),
+                ],
+              ),
               GymUtils().textFormFiledView(
                   controller: _emailController,
                   autofillHints: [AutofillHints.email],
@@ -149,7 +178,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       iconDisabledColor: Colors.white,
                       iconEnabledColor: Colors.white,
                       dropdownColor: Colors.blueGrey,
-
                       icon: const Icon(Icons.keyboard_arrow_down),
                       // Array list of items
                       items: items.map((String items) {
@@ -175,7 +203,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     if (_emailController.text.isNotEmpty &&
                         _pwdController.text.isNotEmpty &&
                         _lastNameController.text.isNotEmpty &&
-                        _genderController.text.isNotEmpty &&
+                        genderController.gender.value.isNotEmpty &&
                         _firstNameController.text.isNotEmpty &&
                         _ageController.text.isNotEmpty &&
                         _phoneController.text.isNotEmpty) {
@@ -185,7 +213,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         mobileNo: _phoneController.text,
                         age: _ageController.text,
                         firstName: _firstNameController.text,
-                        gender: _genderController.text,
+                        gender: genderController.gender.value,
                         lastName: _lastNameController.text,
                         password: _pwdController.text,
                         memberShipPlan: 2,
@@ -196,7 +224,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       _emailController.clear();
                       _pwdController.clear();
                       _lastNameController.clear();
-                      _genderController.clear();
                       _firstNameController.clear();
                       _ageController.clear();
                       _phoneController.clear();

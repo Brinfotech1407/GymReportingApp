@@ -125,7 +125,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         r'x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])';
                     RegExp regex = RegExp(pattern.toString());
                     if (!regex.hasMatch(value!)) {
-                      return 'Enter a valid phone number';
+                      return 'Enter a valid email';
                     } else {
                       return null;
                     }

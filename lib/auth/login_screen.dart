@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:gim_app/auth/registration.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
 import 'package:gim_app/gym_utils.dart';
-import 'package:gim_app/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -72,7 +71,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         _pwdController.text.isNotEmpty) {
                       await AuthController.instance.register(
                           _emailController.text, _pwdController.text, context);
-                      Get.to(() => const HomeScreen());
                     }
                   },
                   buttonName: 'Login'),
@@ -114,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
           autofillHints: const [AutofillHints.email],
           cursorColor: Colors.black,
           decoration: InputDecoration(
-              hintText: 'Enter Email number',
+              hintText: 'email',
               hintStyle: const TextStyle(fontSize: 14),
               focusColor: Colors.black,
               fillColor: Colors.grey.shade100,
@@ -150,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
             RegExp regex = RegExp(pattern.toString());
             if (!regex.hasMatch(value!)) {
-              return 'Enter a valid email id';
+              return 'Enter a valid email';
             } else {
               return null;
             }
@@ -170,7 +168,9 @@ class _LoginScreenState extends State<LoginScreen> {
           autofillHints: const [AutofillHints.password],
           obscureText: true,
           cursorColor: Colors.black,
+          maxLength: 6,
           decoration: InputDecoration(
+              counterText: "",
               hintText: 'Enter Password',
               hintStyle: const TextStyle(fontSize: 14),
               focusColor: Colors.black,

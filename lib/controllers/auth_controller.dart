@@ -1,10 +1,10 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/auth/login_screen.dart';
 import 'package:gim_app/auth/registration.dart';
-import 'package:gim_app/services/preference_service.dart';
+import 'package:gim_app/home_screen.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 
@@ -15,7 +15,6 @@ class AuthController extends GetxController {
   //email,pwd,name...
   late final Rx<User?> firebaseUser;
   FirebaseAuth auth = FirebaseAuth.instance;
-  final PreferenceService _preferenceService = PreferenceService();
 
   //will be load when app launches this func will be called and set the firebase userState
   @override
@@ -30,31 +29,47 @@ class AuthController extends GetxController {
 
   _initialScreen(User? user) {
     if (user == null) {
-      print("Login page");
       Get.offAll(() => const RegistrationScreen());
     } else {
       Get.off(() => const LoginScreen());
     }
   }
 
-  Future<void> register(String email, password,BuildContext context) async {
+  Future<void> register(String email, password, BuildContext context) async {
     try {
-      await _preferenceService.init();
-      var  storeUserEmail = _preferenceService.getUserEmail('USEREMAIL')?? '';
-      print('storeUserEmail $storeUserEmail');
-      if(email == storeUserEmail) {
-        await auth.createUserWithEmailAndPassword(
-            email: email.trim(), password: password);
-      }else{
-        QuickAlert.show(
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        // No user found with the given email
+        return QuickAlert.show(
           context: context,
           type: QuickAlertType.warning,
           title: '',
-          text:
-          'Enterd data is not correct.',
+          text: 'No user found with the given email.',
         );
       }
 
+      final userDoc = snapshot.docs.first;
+      print('userDoc ${userDoc.data()['email']}');
+      // Check if the password matches
+      if (userDoc.data()['password'] != password) {
+        // Password does not match
+        return QuickAlert.show(
+          context: context,
+          type: QuickAlertType.warning,
+          title: '',
+          text: 'Password does not match',
+        );
+      }
+
+      // User found and password matches
+      await auth.createUserWithEmailAndPassword(
+          email: email.trim(), password: password);
+
+      Get.to(() => const HomeScreen());
     } catch (e) {
       Get.snackbar(
         "About User",

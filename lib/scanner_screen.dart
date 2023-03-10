@@ -1,8 +1,5 @@
-
-
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:gim_app/profile_screen.dart';
+import 'package:gim_app/qr_scanner_overlay.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class HomeScreen extends StatefulWidget {

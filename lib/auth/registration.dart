@@ -269,7 +269,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         _phoneController.text.isNotEmpty) {
                       final UserModel userData = UserModel(
                         email: _emailController.text,
-                        id: const Uuid().v4(),
+                        id: userID(),
                         mobileNo: _phoneController.text,
                         age: _ageController.text,
                         firstName: _firstNameController.text,
@@ -293,7 +293,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       if(userTypeController.userType.value == 0) {
                         Get.to(const LoginScreen());
                       }else{
-                        Get.to(const GymDetailsScreen());
+                        Get.to(GymDetailsScreen(ownerID: userID(),));
                       }
                     }
                   },
@@ -324,5 +324,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         ),
       ),
     );
+  }
+
+  String userID(){
+   return Uuid().v4();
   }
 }

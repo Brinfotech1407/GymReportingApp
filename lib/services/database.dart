@@ -60,4 +60,23 @@ class Database {
       throw Exception(e.toString());
     }
   }
+
+
+  Future<String> createGymDetails(
+      Map<String, dynamic>? gymData, String uid,BuildContext context) async {
+    if (gymData != null) {
+      try {
+          // Add user data to Firestore
+          await _firestore
+              .collection("gym")
+              .doc(uid)
+              .set(gymData, SetOptions(merge: true));
+
+        print("your user data is $gymData");
+      } on Exception catch (e) {
+        log('Exception $e');
+      }
+    }
+    return uid;
+  }
 }

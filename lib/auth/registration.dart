@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/auth/login_screen.dart';
 import 'package:gim_app/controllers/gender_controller.dart';
+import 'package:gim_app/controllers/user_type_controller.dart';
+import 'package:gim_app/gym_details_screen.dart';
 import 'package:gim_app/gym_utils.dart';
 import 'package:gim_app/models/user.dart';
 import 'package:gim_app/services/database.dart';
@@ -23,17 +25,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController _pwdController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final GenderController genderController = Get.put(GenderController());
+  final UserTypeController userTypeController = Get.put(UserTypeController());
   RxInt dropdownValue = 1.obs;
+  String deviceToken = '';
 
   var itemList = [1, 2, 3, 4, 5, 6].obs;
 
-  NotificationServices notificationServices =NotificationServices();
+  NotificationServices notificationServices = NotificationServices();
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     notificationServices.isTokenRefresh();
-    notificationServices.getDeviceToken().then((value){
+    notificationServices.getDeviceToken().then((value) {
+      deviceToken = value;
       print('Device Token value => $value');
     });
   }
@@ -79,48 +84,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   isMaxLength: true,
                   validator: (value) {},
                   hintText: 'age'),
-              const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 16, top: 8, right: 8),
-                    child: Text('Gender',
-                        style: TextStyle(
-                          color: Colors.white,
-                        )),
-                  )),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Flexible(
-                    child: Obx(() {
-                      return RadioListTile(
-                        value: 'male',
-                        activeColor: Colors.white,
-                        title: const Text('Male',
-                            style: TextStyle(color: Colors.white)),
-                        groupValue: genderController.gender.value,
-                        onChanged: (value) {
-                          genderController.setGender(value!);
-                        },
-                      );
-                    }),
-                  ),
-                  Flexible(
-                    child: Obx(() {
-                      return RadioListTile(
-                        value: 'Female',
-                        activeColor: Colors.white,
-                        title: const Text('Female',
-                            style: TextStyle(color: Colors.white)),
-                        groupValue: genderController.gender.value,
-                        onChanged: (value) {
-                          genderController.setGender(value!);
-                        },
-                      );
-                    }),
-                  ),
-                ],
-              ),
               GymUtils().textFormFiledView(
                   controller: _emailController,
                   autofillHints: [AutofillHints.email],
@@ -171,6 +134,88 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   obscureText: true,
                   validator: (value) {},
                   hintText: 'Password'),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(left: 16, ),
+                    child: Text('Gender',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        )),
+                  ),
+                  Flexible(
+                    child: Obx(() {
+                      return RadioListTile(
+                        value: 'male',
+                        activeColor: Colors.white,
+                        title: const Text('Male',
+                            style: TextStyle(color: Colors.white)),
+                        groupValue: genderController.gender.value,
+                        onChanged: (value) {
+                          genderController.setGender(value!);
+                        },
+                      );
+                    }),
+                  ),
+                  Flexible(
+                    child: Obx(() {
+                      return RadioListTile(
+                        value: 'Female',
+                        activeColor: Colors.white,
+                        title: const Text('Female',
+                            style: TextStyle(color: Colors.white)),
+                        groupValue: genderController.gender.value,
+                        onChanged: (value) {
+                          genderController.setGender(value!);
+                        },
+                      );
+                    }),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(left: 16 ),
+                    child: Text('UserType',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        )),
+                  ),
+                  Flexible(
+                    child: Obx(() {
+                      return RadioListTile(
+                        value: 0,
+                        activeColor: Colors.white,
+                        title: const Text('User',
+                            style: TextStyle(color: Colors.white)),
+                        groupValue: userTypeController.userType.value,
+                        onChanged: (value) {
+                          userTypeController.setUserType(value!);
+                        },
+                      );
+                    }),
+                  ),
+                  Flexible(
+                    child: Obx(() {
+                      return RadioListTile(
+                        value: 1,
+                        activeColor: Colors.white,
+                        title: const Text('GymOwner',
+                            style: TextStyle(color: Colors.white)),
+                        groupValue: userTypeController.userType.value,
+                        onChanged: (value) {
+                          userTypeController.setUserType(value!);
+                        },
+                      );
+                    }),
+                  ),
+                ],
+              ),
               Container(
                 margin: const EdgeInsets.only(
                     left: 18, top: 14, bottom: 8, right: 18),
@@ -232,9 +277,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         lastName: _lastNameController.text,
                         password: _pwdController.text,
                         memberShipPlan: dropdownValue.value,
+                        deviceToken: deviceToken,
+                        userType: userTypeController.userType.value,
                       );
-                      await Database()
-                          .createNewUser(userData.toJson(), userData.email!,context);
+                      await Database().createNewUser(
+                          userData.toJson(), userData.email!, context);
 
                       _emailController.clear();
                       _pwdController.clear();
@@ -242,11 +289,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       _firstNameController.clear();
                       _ageController.clear();
                       _phoneController.clear();
-                      Get.to(const LoginScreen());
+
+                      if(userTypeController.userType.value == 0) {
+                        Get.to(const LoginScreen());
+                      }else{
+                        Get.to(const GymDetailsScreen());
+                      }
                     }
                   },
                   buttonName: 'Register'),
-              Padding (
+              Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,

@@ -13,6 +13,8 @@ class UserModel {
   String? email;
   String? mobileNo;
   String? password;
+  String? deviceToken;
+  int? userType;
   int? memberShipPlan;
 
   UserModel({
@@ -24,11 +26,14 @@ class UserModel {
     this.email,
     this.mobileNo,
     this.password,
+    this.userType,
+    this.deviceToken,
     this.memberShipPlan,
   });
 
   @override
-  List<Object?> get props => [
+  List<Object?> get props =>
+      [
         id,
         firstName,
         lastName,
@@ -37,6 +42,8 @@ class UserModel {
         email,
         mobileNo,
         password,
+        userType,
+        deviceToken,
         memberShipPlan,
       ];
 

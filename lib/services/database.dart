@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gim_app/models/user.dart';
+import 'package:gim_app/services/notification_service.dart';
 import 'package:gim_app/services/preference_service.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
@@ -10,6 +11,7 @@ import 'package:quickalert/widgets/quickalert_dialog.dart';
 class Database {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final PreferenceService _preferenceService = PreferenceService();
+  NotificationServices notificationServices =NotificationServices();
 
   Future<String> createNewUser(
       Map<String, dynamic>? userData, String Uid,BuildContext context) async {

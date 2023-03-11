@@ -5,6 +5,7 @@ import 'package:gim_app/controllers/gender_controller.dart';
 import 'package:gim_app/gym_utils.dart';
 import 'package:gim_app/models/user.dart';
 import 'package:gim_app/services/database.dart';
+import 'package:gim_app/services/notification_service.dart';
 import 'package:uuid/uuid.dart';
 
 class RegistrationScreen extends StatefulWidget {
@@ -25,6 +26,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   RxInt dropdownValue = 1.obs;
 
   var itemList = [1, 2, 3, 4, 5, 6].obs;
+
+  NotificationServices notificationServices =NotificationServices();
+
+  @override
+  void initState(){
+    super.initState();
+    notificationServices.isTokenRefresh();
+    notificationServices.getDeviceToken().then((value){
+      print('Device Token value => $value');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

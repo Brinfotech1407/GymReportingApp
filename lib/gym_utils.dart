@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:gim_app/auth/login_screen.dart';
+import 'package:gim_app/scanner_screen.dart';
+import 'package:gim_app/utils/app_constant.dart';
 
 class GymUtils {
   BoxDecoration buildBoxDecoration() {
@@ -88,5 +92,17 @@ class GymUtils {
         },
       ),
     );
+  }
+
+  void redirectUserBasedOnType(int userType) {
+    if (userType == AppConstant.userTypeNormal) {
+      Get.to(() => const HomeScreen());
+    } else {
+      //Todo(Bhavika):needs to create one more home screen for gym owner
+    }
+  }
+
+  void redirectToLoginScreen() {
+    Get.to(() => const LoginScreen());
   }
 }

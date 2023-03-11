@@ -85,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       bool usertype =  _preferenceService.getUserType();
                       print('usertype $usertype');
 
-                      await AuthController.instance.register(
+                      await AuthController.instance.loginUser(
                           _emailController.text, _pwdController.text, context);
                       if (usertype) {
                         Get.to(() => GymDetailsScreen(ownerID: widget.ownerID ?? ''));

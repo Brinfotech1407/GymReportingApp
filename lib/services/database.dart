@@ -13,15 +13,16 @@ class Database {
   final PreferenceService _preferenceService = PreferenceService();
   NotificationServices notificationServices =NotificationServices();
 
+  //Todo(Bhavika): Needs to change param userData To Model
   Future<String> createNewUser(
-      Map<String, dynamic>? userData, String Uid,BuildContext context) async {
+      Map<String, dynamic>? userData, String emailId,BuildContext context) async {
     if (userData != null) {
       await _preferenceService.init();
-      await _preferenceService.setUserEmail(Uid);
+      await _preferenceService.setUserEmail(emailId);
       try {
         var querySnapshot = await _firestore
             .collection("users")
-            .where('email', isEqualTo: Uid)
+            .where('email', isEqualTo: emailId)
             .get();
 
         if (querySnapshot.docs.isNotEmpty) {
@@ -38,15 +39,17 @@ class Database {
           // Add user data to Firestore
           await _firestore
               .collection("users")
-              .doc(Uid)
+              .doc(emailId)
               .set(userData, SetOptions(merge: true));
+
+          //Todo(Bhavika): Create User Method needs to call here from login
         }
         print("your user data is $userData");
       } on Exception catch (e) {
         log('Exception $e');
       }
     }
-    return Uid;
+    return emailId;
   }
 
   Future<UserModel?> getUser(String uid) async {

@@ -5,6 +5,8 @@ import 'package:gim_app/Binding/authBinding.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
 import 'package:gim_app/auth/login_screen.dart';
 
+import 'splash_screen.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp().then((value) {
@@ -26,7 +28,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Montserrat',
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const LoginScreen(),
+      home: const SplashScreen(),
       initialBinding: AuthBinding(),
     );
   }

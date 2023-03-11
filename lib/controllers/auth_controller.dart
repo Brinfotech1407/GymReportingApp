@@ -3,13 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/auth/login_screen.dart';
-import 'package:gim_app/auth/registration.dart';
-import 'package:gim_app/gym_details_screen.dart';
+import 'package:gim_app/gym_utils.dart';
+import 'package:gim_app/models/user.dart';
 import 'package:gim_app/scanner_screen.dart';
 import 'package:gim_app/services/preference_service.dart';
+import 'package:gim_app/utils/app_constant.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
-import 'package:uuid/uuid.dart';
 
 class AuthController extends GetxController {
   //AuthController.instance...
@@ -39,7 +39,7 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<void> register(String email, password, BuildContext context) async {
+  Future<void> loginUser(String email, password, BuildContext context) async {
     try {
       final snapshot = await FirebaseFirestore.instance
           .collection('users')
@@ -57,8 +57,10 @@ class AuthController extends GetxController {
       }
 
       final userDoc = snapshot.docs.first;
+      UserModel user = UserModel.fromJson(userDoc.data());
+
       // Check if the password matches
-      if (userDoc.data()['password'] != password) {
+      if (user.password != password) {
         // Password does not match
         return QuickAlert.show(
           context: context,
@@ -72,15 +74,19 @@ class AuthController extends GetxController {
       await auth.createUserWithEmailAndPassword(
           email: email.trim(), password: password);
 
-      if(userDoc.data()['userType'] == 0){
-        _preferenceService.setUserType(true);
-        String ownerID = userDoc.data()['id'] ;
+      _preferenceService.setString(PreferenceService.userEmail, user.email);
 
-      }else{
-        Get.to(() => const HomeScreen());
-      }
+      _preferenceService.setString(
+          PreferenceService.userName, '${user.firstName} ${user.lastName}');
 
+      _preferenceService.setBool(PreferenceService.userLoggedIN, true);
 
+      _preferenceService.setInt(PreferenceService.userType, user.userType);
+
+      _preferenceService.setString(PreferenceService.userID, user.id);
+
+      GymUtils().redirectUserBasedOnType(
+          _preferenceService.getInt(PreferenceService.userType) ?? 0);
 
     } catch (e) {
       Get.snackbar(
@@ -116,6 +122,7 @@ class AuthController extends GetxController {
   }
 
   void logout() async {
+    _preferenceService.setBool(PreferenceService.userLoggedIN, false);
     await auth.signOut();
   }
 
@@ -131,4 +138,6 @@ class AuthController extends GetxController {
       Get.snackbar("Error", "Somthing went wrong");
     }
   }
+
+
 }

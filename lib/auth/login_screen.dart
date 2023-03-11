@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/auth/registration.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
+import 'package:gim_app/gym_details_screen.dart';
 import 'package:gim_app/gym_utils.dart';
+import 'package:gim_app/scanner_screen.dart';
+import 'package:gim_app/services/preference_service.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  final String? ownerID;
+
+  const LoginScreen({super.key,  this.ownerID});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -15,6 +20,14 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final PreferenceService _preferenceService = PreferenceService();
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,12 +82,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   onSubmitBtnTap: () async {
                     if (_emailController.text.isNotEmpty &&
                         _pwdController.text.isNotEmpty) {
+                      bool usertype =  _preferenceService.getUserType();
+                      print('usertype $usertype');
+
                       await AuthController.instance.register(
                           _emailController.text, _pwdController.text, context);
+                      if (usertype) {
+                        Get.to(() => GymDetailsScreen(ownerID: widget.ownerID ?? ''));
+                      } else {
+                        Get.to(() => HomeScreen());
+                      }
                     }
                   },
                   buttonName: 'Login'),
-              Padding (
+              Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,

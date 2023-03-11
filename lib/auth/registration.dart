@@ -291,7 +291,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       _phoneController.clear();
 
                       if(userTypeController.userType.value == 0) {
-                        Get.to(const LoginScreen());
+                        Get.to( LoginScreen(ownerID:userID()));
                       }else{
                         Get.to(GymDetailsScreen(ownerID: userID(),));
                       }
@@ -309,7 +309,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     ),
                     InkWell(
                       onTap: () {
-                        Get.to(() => const LoginScreen());
+                        Get.to(() =>  LoginScreen(ownerID: userID(),));
                       },
                       child: const Text(
                         "log-in",

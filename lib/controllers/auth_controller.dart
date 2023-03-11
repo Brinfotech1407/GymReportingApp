@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/auth/login_screen.dart';
 import 'package:gim_app/auth/registration.dart';
+import 'package:gim_app/gym_details_screen.dart';
 import 'package:gim_app/scanner_screen.dart';
+import 'package:gim_app/services/preference_service.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
+import 'package:uuid/uuid.dart';
 
 class AuthController extends GetxController {
   //AuthController.instance...
@@ -15,6 +18,7 @@ class AuthController extends GetxController {
   //email,pwd,name...
   late final Rx<User?> firebaseUser;
   FirebaseAuth auth = FirebaseAuth.instance;
+  final PreferenceService _preferenceService = PreferenceService();
 
   //will be load when app launches this func will be called and set the firebase userState
   @override
@@ -68,7 +72,16 @@ class AuthController extends GetxController {
       await auth.createUserWithEmailAndPassword(
           email: email.trim(), password: password);
 
-      Get.to(() => const HomeScreen());
+      if(userDoc.data()['userType'] == 0){
+        _preferenceService.setUserType(true);
+        String ownerID = userDoc.data()['id'] ;
+
+      }else{
+        Get.to(() => const HomeScreen());
+      }
+
+
+
     } catch (e) {
       Get.snackbar(
         "About User",

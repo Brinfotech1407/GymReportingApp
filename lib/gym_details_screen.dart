@@ -10,9 +10,9 @@ import 'package:gim_app/services/database.dart';
 import 'package:uuid/uuid.dart';
 
 class GymDetailsScreen extends StatefulWidget {
-  final String? ownerID;
+  final String ownerID;
 
-  const GymDetailsScreen({super.key, this.ownerID});
+  const GymDetailsScreen({super.key, required this.ownerID});
 
   @override
   State<GymDetailsScreen> createState() => _GymDetailsScreenState();

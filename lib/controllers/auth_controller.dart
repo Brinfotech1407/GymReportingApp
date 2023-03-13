@@ -3,9 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/auth/login_screen.dart';
+import 'package:gim_app/gym_details_screen.dart';
 import 'package:gim_app/gym_utils.dart';
 import 'package:gim_app/models/user.dart';
-import 'package:gim_app/scanner_screen.dart';
+import 'package:gim_app/home_screen.dart';
 import 'package:gim_app/services/preference_service.dart';
 import 'package:gim_app/utils/app_constant.dart';
 import 'package:quickalert/models/quickalert_type.dart';
@@ -28,16 +29,20 @@ class AuthController extends GetxController {
     //our user would be notified
     firebaseUser.bindStream(auth.userChanges());
     //listioning every changes
-    ever(firebaseUser, _initialScreen);
+   // ever(firebaseUser, _initialScreen);
   }
 
-  _initialScreen(User? user) {
+  /*_initialScreen(User? user) {
     if (user == null) {
       Get.offAll(() => const LoginScreen());
     } else {
-      Get.off(() => const HomeScreen());
-    }
+      if (user.t == AppConstant.userTypeGymOwner) {
+        Get.to(() => const GymDetailsScreen(ownerID: ''));
+      } else {
+        Get.to(() => const HomeScreen());
+      }
   }
+  }*/
 
   Future<void> loginUser(String email, password, BuildContext context) async {
     try {

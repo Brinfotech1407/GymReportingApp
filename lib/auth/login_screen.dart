@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/auth/registration.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
-import 'package:gim_app/gym_details_screen.dart';
 import 'package:gim_app/gym_utils.dart';
-import 'package:gim_app/scanner_screen.dart';
 import 'package:gim_app/services/preference_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -87,11 +85,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       await AuthController.instance.loginUser(
                           _emailController.text, _pwdController.text, context);
-                      if (usertype) {
-                        Get.to(() => GymDetailsScreen(ownerID: widget.ownerID ?? ''));
-                      } else {
-                        Get.to(() => HomeScreen());
-                      }
+                      const CircularProgressIndicator();
+
                     }
                   },
                   buttonName: 'Login'),

@@ -25,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(color: Colors.white),
+        decoration: GymUtils().buildBoxDecoration(),
         child: const Center(
           child: Text('Gym App'),
         ),
@@ -36,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void redirectToNextScreen() {
     Future<void>.delayed(const Duration(seconds: 3), () async {
       bool isUserLoggedIn =
-         await _preferenceService?.getBool(PreferenceService.userLoggedIN) ?? false;
+         _preferenceService?.getBool(PreferenceService.userLoggedIN) ?? false;
       if (isUserLoggedIn) {
         int userType = _preferenceService?.getInt(PreferenceService.userType) ??
             AppConstant.userTypeNormal;

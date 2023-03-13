@@ -72,8 +72,8 @@ class AuthController extends GetxController {
       }
 
       // User found and password matches
-      await auth.createUserWithEmailAndPassword(
-          email: email.trim(), password: password);
+     /* await auth.createUserWithEmailAndPassword(
+          email: email.trim(), password: password);*/
 
       _preferenceService.setString(PreferenceService.userEmail, user.email);
 

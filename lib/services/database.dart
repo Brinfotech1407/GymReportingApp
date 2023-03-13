@@ -43,7 +43,10 @@ class Database {
             .doc(emailId)
             .set(userData.toJson(), SetOptions(merge: true));
 
-        //Todo(Bhavika): Create User Method needs to call here from login
+        if(userData.email !=null  && userData.password !=null) {
+          await auth.createUserWithEmailAndPassword(
+              email: userData.email!, password: userData.password!);
+        }
       }
       print("your user data is $userData");
     } on Exception catch (e) {

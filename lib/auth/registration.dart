@@ -312,6 +312,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   String userID(){
-   return Uuid().v4();
+   return const Uuid().v4();
   }
 }

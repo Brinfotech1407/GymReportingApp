@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gim_app/controllers/auth_controller.dart';
 import 'package:gim_app/qr_scanner_overlay.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -11,7 +12,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
-   String? capture;
+  String? capture;
   MobileScannerController cameraController = MobileScannerController();
   MobileScannerArguments? arguments;
 
@@ -31,8 +32,19 @@ class _HomeScreenState extends State<HomeScreen>
     return Scaffold(
         body: SafeArea(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+             // mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                      padding: const EdgeInsets.only(bottom: 18),
+                      child: IconButton(
+                          onPressed: () async {
+                            AuthController.instance.logout();
+                          },
+                          icon: const Icon(Icons.logout)),
+                  ),
+                ),
                 const Padding(
                   padding: EdgeInsets.only(bottom: 18),
                   child: Text('Gym App',
@@ -51,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen>
                             controller: cameraController,
                             onDetect: (barcodes) {
                               capture = barcodes.barcodes.first.rawValue;
-                                debugPrint('Barcode found! $capture');
+                              debugPrint('Barcode found! $capture');
                             }),
                         const QRScannerOverlay(overlayColour: Colors.white),
                       ],

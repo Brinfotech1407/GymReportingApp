@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gim_app/services/preference_service.dart';
 import 'package:gim_app/utils/app_constant.dart';
 
-import 'gym_utils.dart';
+import 'utils/gym_utils.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);

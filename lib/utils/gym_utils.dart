@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/auth/login_screen.dart';
-import 'package:gim_app/gym_owner_home_screen.dart';
-import 'package:gim_app/home_screen.dart';
+import 'package:gim_app/Home/gym_owner_home_screen.dart';
+import 'package:gim_app/Home/home_screen.dart';
 import 'package:gim_app/utils/app_constant.dart';
 
 class GymUtils {

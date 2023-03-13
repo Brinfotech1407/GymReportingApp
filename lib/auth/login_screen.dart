@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/auth/registration.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
-import 'package:gim_app/gym_utils.dart';
+import 'package:gim_app/utils/gym_utils.dart';
 import 'package:gim_app/services/preference_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -80,8 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   onSubmitBtnTap: () async {
                     if (_emailController.text.isNotEmpty &&
                         _pwdController.text.isNotEmpty) {
-                      bool usertype =  _preferenceService.getUserType();
-                      print('usertype $usertype');
+
 
                       await AuthController.instance.loginUser(
                           _emailController.text, _pwdController.text, context);

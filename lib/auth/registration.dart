@@ -4,7 +4,7 @@ import 'package:gim_app/auth/login_screen.dart';
 import 'package:gim_app/controllers/gender_controller.dart';
 import 'package:gim_app/controllers/user_type_controller.dart';
 import 'package:gim_app/gym_details_screen.dart';
-import 'package:gim_app/gym_utils.dart';
+import 'package:gim_app/utils/gym_utils.dart';
 import 'package:gim_app/models/user.dart';
 import 'package:gim_app/services/database.dart';
 import 'package:gim_app/services/notification_service.dart';

@@ -2,13 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:gim_app/auth/login_screen.dart';
-import 'package:gim_app/gym_details_screen.dart';
-import 'package:gim_app/gym_utils.dart';
+import 'package:gim_app/utils/gym_utils.dart';
 import 'package:gim_app/models/user.dart';
-import 'package:gim_app/home_screen.dart';
 import 'package:gim_app/services/preference_service.dart';
-import 'package:gim_app/utils/app_constant.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 
@@ -108,41 +104,12 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<void> login(String email, password) async {
-    try {
-      await auth.signInWithEmailAndPassword(email: email, password: password);
-    } catch (e) {
-      Get.snackbar(
-        "About User",
-        "user message",
-        backgroundColor: Colors.redAccent,
-        snackPosition: SnackPosition.BOTTOM,
-        titleText: const Text(
-          "Login failed",
-          style: TextStyle(color: Colors.white),
-        ),
-        messageText: Text(e.toString()),
-      );
-    }
-  }
 
   void logout() async {
     _preferenceService.setBool(PreferenceService.userLoggedIN, false);
     await auth.signOut();
   }
 
-  //phone authentication
-  loginWithPhoneNo(String phoneNumber) async {
-    try {
-      await auth.signInWithPhoneNumber(phoneNumber);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'invalid-phone-number') {
-        Get.snackbar("Error", "Invalid Phone No");
-      }
-    } catch (_) {
-      Get.snackbar("Error", "Somthing went wrong");
-    }
-  }
 
 
 }

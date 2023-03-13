@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gim_app/models/user.dart';
 import 'package:gim_app/services/notification_service.dart';
@@ -12,42 +13,41 @@ class Database {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final PreferenceService _preferenceService = PreferenceService();
   NotificationServices notificationServices =NotificationServices();
+  FirebaseAuth auth = FirebaseAuth.instance;
 
-  //Todo(Bhavika): Needs to change param userData To Model
+
   Future<String> createNewUser(
-      Map<String, dynamic>? userData, String emailId,BuildContext context) async {
-    if (userData != null) {
-      await _preferenceService.init();
-      await _preferenceService.setUserEmail(emailId);
-      try {
-        var querySnapshot = await _firestore
+      UserModel userData, String emailId,BuildContext context) async {
+    await _preferenceService.init();
+    await _preferenceService.setUserEmail(emailId);
+    try {
+      var querySnapshot = await _firestore
+          .collection("users")
+          .where('email', isEqualTo: emailId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Email already exists, show error message
+        QuickAlert.show(
+          context: context,
+          type: QuickAlertType.warning,
+          title: '',
+          text:
+          'Email already exists.',
+        );
+        throw "Email already exists";
+      } else {
+        // Add user data to Firestore
+        await _firestore
             .collection("users")
-            .where('email', isEqualTo: emailId)
-            .get();
+            .doc(emailId)
+            .set(userData.toJson(), SetOptions(merge: true));
 
-        if (querySnapshot.docs.isNotEmpty) {
-          // Email already exists, show error message
-          QuickAlert.show(
-            context: context,
-            type: QuickAlertType.warning,
-            title: '',
-            text:
-            'Email already exists.',
-          );
-          throw "Email already exists";
-        } else {
-          // Add user data to Firestore
-          await _firestore
-              .collection("users")
-              .doc(emailId)
-              .set(userData, SetOptions(merge: true));
-
-          //Todo(Bhavika): Create User Method needs to call here from login
-        }
-        print("your user data is $userData");
-      } on Exception catch (e) {
-        log('Exception $e');
+        //Todo(Bhavika): Create User Method needs to call here from login
       }
+      print("your user data is $userData");
+    } on Exception catch (e) {
+      log('Exception $e');
     }
     return emailId;
   }

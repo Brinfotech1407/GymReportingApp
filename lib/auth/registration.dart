@@ -75,6 +75,39 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   keyboardType: TextInputType.text,
                   validator: (value) {},
                   hintText: 'last name'),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Obx(() {
+                      return RadioListTile(
+                        value: 'male',
+                        activeColor: Colors.white,
+                        title: const Text('Male',
+                            style: TextStyle(color: Colors.white)),
+                        groupValue: genderController.gender.value,
+                        onChanged: (value) {
+                          genderController.setGender(value!);
+                        },
+                      );
+                    }),
+                  ),
+                  Flexible(
+                    child: Obx(() {
+                      return RadioListTile(
+                        value: 'Female',
+                        activeColor: Colors.white,
+                        title: const Text('Female',
+                            style: TextStyle(color: Colors.white)),
+                        groupValue: genderController.gender.value,
+                        onChanged: (value) {
+                          genderController.setGender(value!);
+                        },
+                      );
+                    }),
+                  ),
+                ],
+              ),
               GymUtils().textFormFiledView(
                   controller: _ageController,
                   autofillHints: [AutofillHints.birthday],
@@ -134,58 +167,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   obscureText: true,
                   validator: (value) {},
                   hintText: 'Password'),
+
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.only(left: 16, ),
-                    child: Text('Gender',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        )),
-                  ),
-                  Flexible(
-                    child: Obx(() {
-                      return RadioListTile(
-                        value: 'male',
-                        activeColor: Colors.white,
-                        title: const Text('Male',
-                            style: TextStyle(color: Colors.white)),
-                        groupValue: genderController.gender.value,
-                        onChanged: (value) {
-                          genderController.setGender(value!);
-                        },
-                      );
-                    }),
-                  ),
-                  Flexible(
-                    child: Obx(() {
-                      return RadioListTile(
-                        value: 'Female',
-                        activeColor: Colors.white,
-                        title: const Text('Female',
-                            style: TextStyle(color: Colors.white)),
-                        groupValue: genderController.gender.value,
-                        onChanged: (value) {
-                          genderController.setGender(value!);
-                        },
-                      );
-                    }),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(left: 16 ),
-                    child: Text('UserType',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        )),
-                  ),
                   Flexible(
                     child: Obx(() {
                       return RadioListTile(
@@ -281,7 +266,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         userType: userTypeController.userType.value,
                       );
                       await Database().createNewUser(
-                          userData.toJson(), userData.email!, context);
+                          userData, userData.email!, context);
 
                       _emailController.clear();
                       _pwdController.clear();

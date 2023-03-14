@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gim_app/services/preference_service.dart';
 import 'package:gim_app/utils/app_constant.dart';
 
-import 'utils/gym_utils.dart';
+import '../utils/gym_utils.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -26,8 +26,13 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Container(
         decoration: GymUtils().buildBoxDecoration(),
-        child: const Center(
-          child: Text('Gym App'),
+        child:  Center(
+          child: Image.asset(
+            'assets/images/gymIcon.png',
+            width: 120,
+            height: 120,
+            color: Colors.white,
+          ),
         ),
       ),
     );

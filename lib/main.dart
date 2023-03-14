@@ -2,10 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/Binding/authBinding.dart';
+import 'package:gim_app/waiting/LoaderScreen.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
-import 'package:gim_app/auth/login_screen.dart';
-
-import 'splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +26,9 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Montserrat',
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const SplashScreen(),
+      home: const LoaderScreen(
+        isFullScreen: true,
+      ),
       initialBinding: AuthBinding(),
     );
   }

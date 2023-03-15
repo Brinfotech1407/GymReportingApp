@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:gim_app/auth/registration.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
 import 'package:gim_app/utils/gym_utils.dart';
+import 'package:gim_app/waiting/LoaderScreen.dart';
 
 
 class LoginScreen extends StatefulWidget {
@@ -18,27 +19,11 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool visible = true;
+  RxBool isLoaded = false.obs;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-  }
-
-  loadProgress(){
-    if(visible == false){
-      setState(() {
-        visible = true;
-        Future.delayed(Duration(seconds: 2));
-      });
-    }
-    else{
-      setState(() {
-        visible = false;
-      });
-    }
-
   }
 
   @override
@@ -92,13 +77,17 @@ class _LoginScreenState extends State<LoginScreen> {
               GymUtils().buildButtonView(
                   context: context,
                   onSubmitBtnTap: () async {
+                    isLoaded.toggle();
                     if (_emailController.text.isNotEmpty &&
                         _pwdController.text.isNotEmpty) {
-
-
+                      if (isLoaded.value == true) {
+                        Get.to(const LoaderScreen(
+                          isFullScreen: true,
+                        ));
+                      }
+                      isLoaded.value = false;
                       await AuthController.instance.loginUser(
                           _emailController.text, _pwdController.text, context);
-                      const CircularProgressIndicator();
 
                     }
                   },

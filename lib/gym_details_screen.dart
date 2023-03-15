@@ -8,6 +8,7 @@ import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:gim_app/utils/gym_utils.dart';
 import 'package:gim_app/models/gym_details.dart';
 import 'package:gim_app/services/database.dart';
+import 'package:gim_app/waiting/LoaderScreen.dart';
 import 'package:uuid/uuid.dart';
 
 import 'Home/gym_owner_home_screen.dart';
@@ -26,6 +27,7 @@ class _GymDetailsScreenState extends State<GymDetailsScreen> {
   final TextEditingController _gymAddressController = TextEditingController();
   final TextEditingController _gymContactNoController = TextEditingController();
   final capacityController = Get.put(CapacityController());
+  RxBool isLoaded = false.obs;
 
   @override
   Widget build(BuildContext context) {
@@ -112,9 +114,15 @@ class _GymDetailsScreenState extends State<GymDetailsScreen> {
               context: context,
               buttonName: 'Submit',
               onSubmitBtnTap: () async {
+                isLoaded.toggle();
                 if (_gymContactNoController.text.isNotEmpty &&
                     _gymAddressController.text.isNotEmpty &&
                     _gymNameController.text.isNotEmpty) {
+                  if (isLoaded.value == true) {
+                    Get.to(const LoaderScreen(
+                      isFullScreen: true,
+                    ));
+                  }
                   final GymDetailsModel gymDetails = GymDetailsModel(
                     id: gymUserID(),
                     name: _gymNameController.text,
@@ -129,6 +137,7 @@ class _GymDetailsScreenState extends State<GymDetailsScreen> {
                   _gymNameController.clear();
                   _gymAddressController.clear();
                   _gymContactNoController.clear();
+                  isLoaded.value = false;
                   Get.to(() => const GymOwnerHomeScreen());
                 }
               },

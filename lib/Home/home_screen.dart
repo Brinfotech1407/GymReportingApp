@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
 import 'package:gim_app/qr_scanner_overlay.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -40,6 +42,12 @@ class _HomeScreenState extends State<HomeScreen>
                       padding: const EdgeInsets.only(bottom: 18),
                       child: IconButton(
                           onPressed: () async {
+                            QuickAlert.show(
+                              context: context,
+                              type: QuickAlertType.warning,
+                              title: '',
+                              text: 'logout',
+                            );
                             AuthController.instance.logout();
                           },
                           icon: const Icon(Icons.logout)),

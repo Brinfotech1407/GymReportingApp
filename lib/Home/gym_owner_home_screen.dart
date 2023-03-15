@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
+import 'package:quickalert/quickalert.dart';
 
 class GymOwnerHomeScreen extends StatefulWidget {
   const GymOwnerHomeScreen({Key? key}) : super(key: key);
@@ -21,6 +22,12 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                 padding: const EdgeInsets.only(bottom: 18),
                 child: IconButton(
                     onPressed: () async {
+                      QuickAlert.show(
+                        context: context,
+                        type: QuickAlertType.warning,
+                        title: '',
+                        text: 'logout',
+                      );
                       AuthController.instance.logout();
                     },
                     icon: const Icon(Icons.logout)),

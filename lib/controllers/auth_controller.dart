@@ -25,7 +25,7 @@ class AuthController extends GetxController {
     //our user would be notified
     firebaseUser.bindStream(auth.userChanges());
     //listioning every changes
-   // ever(firebaseUser, _initialScreen);
+    // ever(firebaseUser, _initialScreen);
   }
 
   /*_initialScreen(User? user) {
@@ -71,10 +71,6 @@ class AuthController extends GetxController {
         );
       }
 
-      // User found and password matches
-     /* await auth.createUserWithEmailAndPassword(
-          email: email.trim(), password: password);*/
-
       _preferenceService.setString(PreferenceService.userEmail, user.email);
 
       _preferenceService.setString(
@@ -87,8 +83,10 @@ class AuthController extends GetxController {
       _preferenceService.setString(PreferenceService.userID, user.id);
 
       GymUtils().redirectUserBasedOnType(
-          _preferenceService.getInt(PreferenceService.userType) ?? 0);
-
+          _preferenceService.getInt(PreferenceService.userType) ?? 0,
+          PreferenceService.userID,
+          _preferenceService.getBool(PreferenceService.ownerGymDetailsFiled) ??
+              false);
     } catch (e) {
       Get.snackbar(
         "About User",
@@ -104,12 +102,9 @@ class AuthController extends GetxController {
     }
   }
 
-
   void logout() async {
     _preferenceService.setBool(PreferenceService.userLoggedIN, false);
+    _preferenceService.setBool(PreferenceService.ownerGymDetailsFiled, false);
     await auth.signOut();
   }
-
-
-
 }

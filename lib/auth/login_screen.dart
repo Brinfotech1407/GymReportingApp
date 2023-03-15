@@ -3,12 +3,12 @@ import 'package:get/get.dart';
 import 'package:gim_app/auth/registration.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
 import 'package:gim_app/utils/gym_utils.dart';
-import 'package:gim_app/services/preference_service.dart';
+
 
 class LoginScreen extends StatefulWidget {
   final String? ownerID;
 
-  const LoginScreen({super.key,  this.ownerID});
+  const LoginScreen({super.key, this.ownerID});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -18,13 +18,27 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final PreferenceService _preferenceService = PreferenceService();
-
+  bool visible = true;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+  }
+
+  loadProgress(){
+    if(visible == false){
+      setState(() {
+        visible = true;
+        Future.delayed(Duration(seconds: 2));
+      });
+    }
+    else{
+      setState(() {
+        visible = false;
+      });
+    }
+
   }
 
   @override

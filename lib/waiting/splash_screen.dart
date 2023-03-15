@@ -42,11 +42,18 @@ class _SplashScreenState extends State<SplashScreen> {
     Future<void>.delayed(const Duration(seconds: 3), () async {
       bool isUserLoggedIn =
          _preferenceService?.getBool(PreferenceService.userLoggedIN) ?? false;
+
+      bool isGymDetailsFiled =
+          _preferenceService?.getBool(PreferenceService.ownerGymDetailsFiled) ?? false;
+
+
       if (isUserLoggedIn) {
         int userType = _preferenceService?.getInt(PreferenceService.userType) ??
             AppConstant.userTypeNormal;
 
-        GymUtils().redirectUserBasedOnType(userType);
+        String ownerID = _preferenceService?.getString(PreferenceService.userID) ?? '';
+
+        GymUtils().redirectUserBasedOnType(userType,ownerID,isGymDetailsFiled);
       } else {
         GymUtils().redirectToLoginScreen();
       }

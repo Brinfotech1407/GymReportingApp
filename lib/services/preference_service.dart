@@ -7,6 +7,7 @@ class PreferenceService {
   static const String userType = 'USER_TYPE';
   static const String userName = 'USER_NAME';
   static const String userLoggedIN = 'USER_LOGGED_IN';
+  static const String ownerGymDetailsFiled = 'GYM_DETAILS_SUBMIT';
   static const String userID = 'USER_ID';
 
   PreferenceService() {

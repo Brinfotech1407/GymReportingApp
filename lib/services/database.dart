@@ -48,7 +48,6 @@ class Database {
               email: userData.email!, password: userData.password!);
         }
       }
-      print("your user data is $userData");
     } on Exception catch (e) {
       log('Exception $e');
     }
@@ -78,7 +77,8 @@ class Database {
               .doc(uid)
               .set(gymData, SetOptions(merge: true));
 
-        print("your user data is $gymData");
+          _preferenceService.setBool(PreferenceService.ownerGymDetailsFiled, true);
+
       } on Exception catch (e) {
         log('Exception $e');
       }

@@ -12,21 +12,23 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
-      body: Column(
-        children: [
-          Align(
-            alignment: Alignment.topRight,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 18),
-              child: IconButton(
-                  onPressed: () async {
-                    AuthController.instance.logout();
-                  },
-                  icon: const Icon(Icons.logout)),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 18),
+                child: IconButton(
+                    onPressed: () async {
+                      AuthController.instance.logout();
+                    },
+                    icon: const Icon(Icons.logout)),
+              ),
             ),
-          ),
-          const Center(child: Text('Gym Owner Screen',)),
-        ],
+            const Center(child: Text('Gym Owner Screen',)),
+          ],
+        ),
       ),
     );
   }

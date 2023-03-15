@@ -8,6 +8,7 @@ import 'package:gim_app/utils/gym_utils.dart';
 import 'package:gim_app/models/user.dart';
 import 'package:gim_app/services/database.dart';
 import 'package:gim_app/services/notification_service.dart';
+import 'package:gim_app/waiting/LoaderScreen.dart';
 import 'package:uuid/uuid.dart';
 
 class RegistrationScreen extends StatefulWidget {
@@ -28,6 +29,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final UserTypeController userTypeController = Get.put(UserTypeController());
   RxInt dropdownValue = 1.obs;
   String deviceToken = '';
+  RxBool isLoaded = false.obs;
 
   var itemList = [1, 2, 3, 4, 5, 6].obs;
 
@@ -167,7 +169,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   obscureText: true,
                   validator: (value) {},
                   hintText: 'Password'),
-
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -245,6 +246,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               GymUtils().buildButtonView(
                   context: context,
                   onSubmitBtnTap: () async {
+                    isLoaded.toggle();
                     if (_emailController.text.isNotEmpty &&
                         _pwdController.text.isNotEmpty &&
                         _lastNameController.text.isNotEmpty &&
@@ -252,6 +254,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         _firstNameController.text.isNotEmpty &&
                         _ageController.text.isNotEmpty &&
                         _phoneController.text.isNotEmpty) {
+
+                      if (isLoaded.value == true) {
+                        Get.to(const LoaderScreen(
+                          isFullScreen: true,
+                        ));
+                      }
                       final UserModel userData = UserModel(
                         email: _emailController.text,
                         id: userID(),
@@ -265,8 +273,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         deviceToken: deviceToken,
                         userType: userTypeController.userType.value,
                       );
-                      await Database().createNewUser(
-                          userData, userData.email!, context);
+                      await Database()
+                          .createNewUser(userData, userData.email!, context);
 
                       _emailController.clear();
                       _pwdController.clear();
@@ -275,10 +283,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       _ageController.clear();
                       _phoneController.clear();
 
-                      if(userTypeController.userType.value == 0) {
-                        Get.to( LoginScreen(ownerID:userID()));
-                      }else{
-                        Get.to(GymDetailsScreen(ownerID: userID(),));
+                      isLoaded.value = false;
+                      if (userTypeController.userType.value == 0) {
+                        Get.to(LoginScreen(ownerID: userID()));
+                      } else {
+                        Get.to(GymDetailsScreen(
+                          ownerID: userID(),
+                        ));
                       }
                     }
                   },
@@ -294,7 +305,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     ),
                     InkWell(
                       onTap: () {
-                        Get.to(() =>  LoginScreen(ownerID: userID(),));
+                        Get.to(() => LoginScreen(
+                              ownerID: userID(),
+                            ));
                       },
                       child: const Text(
                         "log-in",
@@ -311,7 +324,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  String userID(){
-   return const Uuid().v4();
+  String userID() {
+    return const Uuid().v4();
   }
 }

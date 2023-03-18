@@ -69,14 +69,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   textInputType: TextInputType.name,
                   keyboardType: TextInputType.text,
                   validator: (value) {},
-                  hintText: 'first name'),
+                  hintText: 'First Name'),
               GymUtils().textFormFiledView(
                   controller: _lastNameController,
                   autofillHints: [AutofillHints.nameSuffix],
                   textInputType: TextInputType.name,
                   keyboardType: TextInputType.text,
                   validator: (value) {},
-                  hintText: 'last name'),
+                  hintText: 'Last Name'),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -167,7 +167,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   maxLength: 6,
                   isMaxLength: true,
                   obscureText: true,
-                  validator: (value) {},
+                  validator: (value) {
+                    Pattern pattern =
+                        r'^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$';
+                    RegExp regex = RegExp(pattern.toString());
+                    if (!regex.hasMatch(value!)) {
+                      return 'Enter a valid Password';
+                    } else {
+                      return null;
+                    }
+                  },
                   hintText: 'Password'),
               Row(
                 mainAxisSize: MainAxisSize.min,

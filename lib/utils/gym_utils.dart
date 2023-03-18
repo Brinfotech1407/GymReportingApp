@@ -23,13 +23,14 @@ class GymUtils {
       required String buttonName}) {
     return Container(
       margin: const EdgeInsets.only(top: 30),
+      width: 130,
       height: 50,
-      width: 200,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(27)))),
+            elevation: 3,
+            shape:  RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(60),)),
         onPressed: () {
           onSubmitBtnTap();
         },
@@ -37,6 +38,7 @@ class GymUtils {
           buttonName,
           style: const TextStyle(color: Colors.black, fontSize: 20),
         ),
+
       ),
     );
   }
@@ -78,14 +80,21 @@ class GymUtils {
                 color: Colors.grey,
                 width: 2.0,
               ),
-              borderRadius: BorderRadius.circular(50.0),
+              borderRadius: BorderRadius.circular(8),
             ),
             enabledBorder: OutlineInputBorder(
               borderSide: const BorderSide(
                 color: Colors.grey,
                 width: 0.5,
               ),
-              borderRadius: BorderRadius.circular(16.0),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderSide: const BorderSide(
+                color: Color(0x00000000),
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(8),
             ),
             disabledBorder: const OutlineInputBorder()),
         keyboardType: keyboardType,

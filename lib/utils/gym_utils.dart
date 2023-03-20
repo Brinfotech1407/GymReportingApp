@@ -110,7 +110,7 @@ class GymUtils {
       required String ownerID,
       required bool ownerGymDetailsFiled}) {
     if (userType == AppConstant.userTypeNormal) {
-      Get.to(() => const HomeScreen());
+      Get.to(() =>  HomeScreen(currentUserID: ownerID,));
     } else {
       showOwnerScreens(ownerGymDetailsFiled: ownerGymDetailsFiled,ownerID:  ownerID);
     }

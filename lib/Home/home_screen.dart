@@ -2,13 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/auth/login_screen.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
+import 'package:gim_app/models/gym_report_model.dart';
 import 'package:gim_app/qr_scanner_overlay.dart';
+import 'package:gim_app/services/database.dart';
+import 'package:gim_app/waiting/LoaderScreen.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
+import 'package:uuid/uuid.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String currentUserID;
+
+  const HomeScreen({super.key, required this.currentUserID});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -16,11 +23,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
-  String? capture;
+  String? scannerId;
   MobileScannerController cameraController = MobileScannerController();
   MobileScannerArguments? arguments;
 
   bool isStarted = true;
+  RxBool isLoaded = false.obs;
 
   @override
   void dispose() {
@@ -36,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen>
       } else {
         cameraController.start();
       }
-        isStarted = !isStarted;
+      isStarted = !isStarted;
     });
     super.initState();
   }
@@ -44,89 +52,101 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     double scanArea = buildScanArea(context);
-
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+    String formattedTime = DateFormat('HH:mm:ss').format(now);
     return Scaffold(
         body: SafeArea(
             child: Column(
+      children: [
+        Align(
+          alignment: Alignment.topRight,
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 18),
+            child: IconButton(
+                onPressed: () async {
+                  QuickAlert.show(
+                      context: context,
+                      type: QuickAlertType.confirm,
+                      title: '',
+                      cancelBtnText: 'No',
+                      confirmBtnText: 'yes',
+                      text:
+                          "Are you sure you want to log out? Your session will be terminated and you will need to log in again to use the app.",
+                      onConfirmBtnTap: () {
+                        AuthController.instance.logout();
+                        Get.to(() => const LoginScreen());
+                      });
+                },
+                icon: const Icon(Icons.logout)),
+          ),
+        ),
+        const Padding(
+          padding: EdgeInsets.only(bottom: 18),
+          child: Text('Gym App',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
+        ),
+        Align(
+          alignment: Alignment.center,
+          child: SizedBox(
+            height: scanArea,
+            width: scanArea,
+            child: Stack(
+              alignment: Alignment.center,
               children: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: Padding(
-                      padding: const EdgeInsets.only(bottom: 18),
-                      child: IconButton(
-                          onPressed: () async {
-                            QuickAlert.show(
-                              context: context,
-                              type: QuickAlertType.confirm,
-                              title: '',
-                                cancelBtnText: 'No',
-                                confirmBtnText: 'yes',
-                                text: "Are you sure you want to log out? Your session will be terminated and you will need to log in again to use the app.",
-                              onConfirmBtnTap: () {
-                                AuthController.instance.logout();
-                                Get.to(() => const LoginScreen());
-                              }
-                            );
+                MobileScanner(
+                    controller: cameraController,
+                    onDetect: (barcodes) async {
+                      scannerId = barcodes.barcodes.first.rawValue;
+                      if (scannerId !=null && scannerId!.isNotEmpty ) {
+                        cameraController.stop();
 
-                          },
-                          icon: const Icon(Icons.logout)),
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 18),
-                  child: Text('Gym App',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 25)),
-                ),
-                Align(
-                  alignment: Alignment.center,
-                  child: SizedBox(
-                    height: scanArea,
-                    width: scanArea,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        MobileScanner(
-                            controller: cameraController,
-                            onDetect: (barcodes) {
-                              capture = barcodes.barcodes.first.rawValue;
-                              debugPrint('Barcode found! $capture');
-                            }),
-                        const QRScannerOverlay(overlayColour: Colors.white),
-                      ],
-                    ),
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.only(top: 18),
-                  child: Text('Scan QR Code here',
-                      style: TextStyle(
-                        fontSize: 20,
-                      )),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 18),
-                  child: Text('Scan QR Code Value: ${capture ?? ''}',
-                      style: const TextStyle(
-                          fontSize: 20,
-                          color: Colors.blue
-                      )),
-                ),
+                        isLoaded.toggle();
+                        GymReportModel gymReport = GymReportModel(
+                            id: gymUserID(),
+                            gymId: barcodes.barcodes.first.rawValue!,
+                            userId: widget.currentUserID,
+                            date: formattedDate,
+                            signInTime: formattedTime,
+                            signOutTime: '0',
+                            isUserSignedOutForDay: false);
+
+                        if (isLoaded.value == true) {
+                          Get.to(const LoaderScreen(
+                            isFullScreen: true,
+                          ));
+                        }
+                        await Database().createGymReport(gymReport, context);
+                        isLoaded.value = false;
+                      }else{
+                        cameraController.start();
+                      }
+
+                      debugPrint('Barcode found! $scannerId');
+                    }),
+                const QRScannerOverlay(overlayColour: Colors.white),
               ],
-            )
-        )
-    );
+            ),
+          ),
+        ),
+        const Padding(
+          padding: EdgeInsets.only(top: 18),
+          child: Text('Scan QR Code here',
+              style: TextStyle(
+                fontSize: 20,
+              )),
+        ),
+      ],
+    )));
+  }
+
+  String gymUserID() {
+    return const Uuid().v4();
   }
 
   double buildScanArea(BuildContext context) {
-       double scanArea = (MediaQuery
-        .of(context)
-        .size
-        .width < 400 ||
-        MediaQuery
-            .of(context)
-            .size
-            .height < 400)
+    double scanArea = (MediaQuery.of(context).size.width < 400 ||
+            MediaQuery.of(context).size.height < 400)
         ? 400.0
         : 450.0;
     return scanArea;

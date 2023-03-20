@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gim_app/models/gym_details.dart';
+import 'package:gim_app/models/gym_report_model.dart';
 import 'package:gim_app/models/user.dart';
 import 'package:gim_app/services/notification_service.dart';
 import 'package:gim_app/services/preference_service.dart';
@@ -86,12 +87,26 @@ class Database {
           .doc(user.email)
           .update({'isGymDetailsFilled': true});
 
-      print('gymowner name ${user.firstName} isGymDetailsFilled ${user.isGymDetailsFilled}');
-
 
     } on Exception catch (e) {
       log('Exception $e');
     }
     return gymData.id;
+  }
+
+
+  Future<String?> createGymReport(
+      GymReportModel gymReportData, BuildContext context) async {
+    try {
+      // Add user data to Firestore
+      await _firestore
+          .collection("gym_report")
+          .doc(gymReportData.id)
+          .set(gymReportData.toJson(), SetOptions(merge: true));
+
+    } on Exception catch (e) {
+      log('Exception $e');
+    }
+    return gymReportData.id;
   }
 }

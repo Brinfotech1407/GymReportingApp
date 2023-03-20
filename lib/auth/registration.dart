@@ -292,13 +292,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       _phoneController.clear();
 
                       isLoaded.value = false;
-                      if (userTypeController.userType.value == 0) {
-                        Get.to(LoginScreen(ownerID: userID()));
-                      } else {
-                        Get.to(GymDetailsScreen(
-                          ownerID: userID(),
-                        ));
-                      }
+                      Get.to(LoginScreen(ownerID: userID()));
                     }
                   },
                   buttonName: 'Register'),

@@ -85,7 +85,7 @@ class AuthController extends GetxController {
       _preferenceService.setBool(
           PreferenceService.ownerGymDetailsFiled, user.isGymDetailsFilled);
 
-      print('auth isgymefilled ${ user.isGymDetailsFilled}');
+
 
       GymUtils().redirectUserBasedOnType(
         userType: _preferenceService.getInt(PreferenceService.userType) ?? 0,

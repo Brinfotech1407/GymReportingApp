@@ -108,8 +108,7 @@ class GymUtils {
   void redirectUserBasedOnType(
       {required int userType,
       required String ownerID,
-      required bool ownerGymDetailsFiled,
-       bool isGymDetailsFiled =false}) {
+      required bool ownerGymDetailsFiled}) {
     if (userType == AppConstant.userTypeNormal) {
       Get.to(() => const HomeScreen());
     } else {

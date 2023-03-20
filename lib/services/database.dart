@@ -86,9 +86,9 @@ class Database {
           .doc(user.email)
           .update({'isGymDetailsFilled': true});
 
-      print('isGymDetailsFilled ${user.isGymDetailsFilled}');
+      print('gymowner name ${user.firstName} isGymDetailsFilled ${user.isGymDetailsFilled}');
 
-      _preferenceService.setBool(PreferenceService.ownerGymDetailsFiled, true);
+
     } on Exception catch (e) {
       log('Exception $e');
     }

@@ -263,7 +263,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         _firstNameController.text.isNotEmpty &&
                         _ageController.text.isNotEmpty &&
                         _phoneController.text.isNotEmpty) {
-
                       if (isLoaded.value == true) {
                         Get.to(const LoaderScreen(
                           isFullScreen: true,
@@ -283,8 +282,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         userType: userTypeController.userType.value,
                         isGymDetailsFilled: false,
                       );
-                      await Database()
-                          .createNewUser(userData, context);
+                      await Database().createNewUser(userData, context);
 
                       _emailController.clear();
                       _pwdController.clear();
@@ -297,12 +295,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       if (userTypeController.userType.value == 0) {
                         Get.to(LoginScreen(ownerID: userID()));
                       } else {
-                        //Todo Bhavika check when owner detail filed then show home screen
                         Get.to(GymDetailsScreen(
                           ownerID: userID(),
                         ));
-
-                        //GymUtils().showOwnerScreens(ownerGymDetailsFiled, false, userID())
                       }
                     }
                   },

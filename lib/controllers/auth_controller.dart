@@ -82,13 +82,19 @@ class AuthController extends GetxController {
 
       _preferenceService.setString(PreferenceService.userID, user.id);
 
+      _preferenceService.setBool(
+          PreferenceService.ownerGymDetailsFiled, user.isGymDetailsFilled);
+
+      print('auth isgymefilled ${ user.isGymDetailsFilled}');
+
       GymUtils().redirectUserBasedOnType(
-          userType: _preferenceService.getInt(PreferenceService.userType) ?? 0,
-          ownerID: PreferenceService.userID,
-          ownerGymDetailsFiled: _preferenceService.getBool(
-                PreferenceService.ownerGymDetailsFiled,
-              ) ??
-              false,);
+        userType: _preferenceService.getInt(PreferenceService.userType) ?? 0,
+        ownerID: _preferenceService.getString(PreferenceService.userID) ?? '',
+        ownerGymDetailsFiled: _preferenceService.getBool(
+              PreferenceService.ownerGymDetailsFiled,
+            ) ??
+            false,
+      );
     } catch (e) {
       Get.snackbar(
         "About User",

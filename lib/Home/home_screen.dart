@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/instance_manager.dart';
+import 'package:gim_app/auth/login_screen.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
 import 'package:gim_app/qr_scanner_overlay.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -47,8 +50,12 @@ class _HomeScreenState extends State<HomeScreen>
                               type: QuickAlertType.warning,
                               title: '',
                               text: 'logout',
+                              onConfirmBtnTap: () {
+                                AuthController.instance.logout();
+                                Get.to(() => const LoginScreen());
+                              }
                             );
-                            AuthController.instance.logout();
+
                           },
                           icon: const Icon(Icons.logout)),
                   ),

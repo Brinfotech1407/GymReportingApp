@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/instance_manager.dart';
 import 'package:gim_app/auth/login_screen.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
 import 'package:gim_app/qr_scanner_overlay.dart';
@@ -21,23 +20,34 @@ class _HomeScreenState extends State<HomeScreen>
   MobileScannerController cameraController = MobileScannerController();
   MobileScannerArguments? arguments;
 
+  bool isStarted = true;
+
+  @override
+  void dispose() {
+    cameraController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    setState(() {
+      if (isStarted) {
+        cameraController.stop();
+      } else {
+        cameraController.start();
+      }
+        isStarted = !isStarted;
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    double scanArea = (MediaQuery
-        .of(context)
-        .size
-        .width < 400 ||
-        MediaQuery
-            .of(context)
-            .size
-            .height < 400)
-        ? 400.0
-        : 450.0;
+    double scanArea = buildScanArea(context);
 
     return Scaffold(
         body: SafeArea(
             child: Column(
-             // mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Align(
                   alignment: Alignment.topRight,
@@ -104,5 +114,19 @@ class _HomeScreenState extends State<HomeScreen>
             )
         )
     );
+  }
+
+  double buildScanArea(BuildContext context) {
+       double scanArea = (MediaQuery
+        .of(context)
+        .size
+        .width < 400 ||
+        MediaQuery
+            .of(context)
+            .size
+            .height < 400)
+        ? 400.0
+        : 450.0;
+    return scanArea;
   }
 }

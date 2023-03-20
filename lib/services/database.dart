@@ -13,12 +13,13 @@ import 'package:quickalert/widgets/quickalert_dialog.dart';
 class Database {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final PreferenceService _preferenceService = PreferenceService();
-  NotificationServices notificationServices =NotificationServices();
+  NotificationServices notificationServices = NotificationServices();
   FirebaseAuth auth = FirebaseAuth.instance;
 
-
   Future<String?> createNewUser(
-      UserModel userData,BuildContext context) async {
+      UserModel userData, BuildContext context) async {
+    await _preferenceService.init();
+    await _preferenceService.setUserEmail(userData.email!);
     try {
       var querySnapshot = await _firestore
           .collection("users")
@@ -31,8 +32,7 @@ class Database {
           context: context,
           type: QuickAlertType.warning,
           title: '',
-          text:
-          'Email already exists.',
+          text: 'Email already exists.',
         );
         throw "Email already exists";
       } else {
@@ -42,7 +42,7 @@ class Database {
             .doc(userData.email)
             .set(userData.toJson(), SetOptions(merge: true));
 
-        if(userData.email !=null  && userData.password !=null) {
+        if (userData.email != null && userData.password != null) {
           await auth.createUserWithEmailAndPassword(
               email: userData.email!, password: userData.password!);
         }
@@ -64,18 +64,31 @@ class Database {
     }
   }
 
-
   Future<String?> createGymDetails(
-      GymDetailsModel gymData,BuildContext context) async {
+      GymDetailsModel gymData, BuildContext context) async {
     try {
-        // Add user data to Firestore
-        await _firestore
-            .collection("gym")
-            .doc(gymData.id)
-            .set(gymData.toJson(), SetOptions(merge: true));
+      // Add user data to Firestore
+      await _firestore
+          .collection("gym")
+          .doc(gymData.id)
+          .set(gymData.toJson(), SetOptions(merge: true));
 
-        _preferenceService.setBool(PreferenceService.ownerGymDetailsFiled, true);
+      //TODO : find user first, updated gym Details
 
+      final snapshot = await _firestore.collection('users').get();
+
+      final userDoc = snapshot.docs.last;
+      UserModel user = UserModel.fromJson(userDoc.data());
+      user.isGymDetailsFilled = true;
+
+      await _firestore
+          .collection('users')
+          .doc(user.email)
+          .update({'isGymDetailsFilled': true});
+
+      print('isGymDetailsFilled ${user.isGymDetailsFilled}');
+
+      _preferenceService.setBool(PreferenceService.ownerGymDetailsFiled, true);
     } on Exception catch (e) {
       log('Exception $e');
     }

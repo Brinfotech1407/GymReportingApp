@@ -16,6 +16,7 @@ class UserModel {
   String? deviceToken;
   int? userType;
   int? memberShipPlan;
+  bool isGymDetailsFilled;
 
   UserModel({
     this.id,
@@ -29,6 +30,7 @@ class UserModel {
     this.userType,
     this.deviceToken,
     this.memberShipPlan,
+    this.isGymDetailsFilled = false,
   });
 
   @override
@@ -45,6 +47,7 @@ class UserModel {
         userType,
         deviceToken,
         memberShipPlan,
+        isGymDetailsFilled,
       ];
 
   /// Connect the generated [_$UserFromJson] function to the `fromJson`

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gim_app/models/user.dart';
 import 'package:gim_app/services/preference_service.dart';
 import 'package:gim_app/utils/app_constant.dart';
 
@@ -53,7 +54,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
         String ownerID = _preferenceService?.getString(PreferenceService.userID) ?? '';
 
-        GymUtils().redirectUserBasedOnType(userType,ownerID,isGymDetailsFiled);
+        GymUtils().redirectUserBasedOnType(userType: userType, ownerID:ownerID,ownerGymDetailsFiled: isGymDetailsFiled);
       } else {
         GymUtils().redirectToLoginScreen();
       }

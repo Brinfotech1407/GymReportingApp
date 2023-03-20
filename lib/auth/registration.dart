@@ -281,6 +281,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         memberShipPlan: dropdownValue.value,
                         deviceToken: deviceToken,
                         userType: userTypeController.userType.value,
+                        isGymDetailsFilled: false,
                       );
                       await Database()
                           .createNewUser(userData, context);
@@ -296,9 +297,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       if (userTypeController.userType.value == 0) {
                         Get.to(LoginScreen(ownerID: userID()));
                       } else {
+                        //Todo Bhavika check when owner detail filed then show home screen
                         Get.to(GymDetailsScreen(
                           ownerID: userID(),
                         ));
+
+                        //GymUtils().showOwnerScreens(ownerGymDetailsFiled, false, userID())
                       }
                     }
                   },

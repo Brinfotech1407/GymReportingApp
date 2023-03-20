@@ -106,17 +106,24 @@ class GymUtils {
   }
 
   void redirectUserBasedOnType(
-      int userType, String ownerID, bool isGymDetailsFiled) {
+      {required int userType,
+      required String ownerID,
+      required bool ownerGymDetailsFiled,
+       bool isGymDetailsFiled =false}) {
     if (userType == AppConstant.userTypeNormal) {
       Get.to(() => const HomeScreen());
     } else {
-      if (isGymDetailsFiled) {
-        Get.to(() => const GymOwnerHomeScreen());
-      } else {
-        Get.to(() => GymDetailsScreen(
-              ownerID: ownerID,
-            ));
-      }
+      showOwnerScreens(ownerGymDetailsFiled: ownerGymDetailsFiled,ownerID:  ownerID);
+    }
+  }
+
+  void showOwnerScreens({required bool ownerGymDetailsFiled, required String ownerID}) {
+      if (ownerGymDetailsFiled) {
+      Get.to(() => const GymOwnerHomeScreen());
+    } else {
+      Get.to(() => GymDetailsScreen(
+            ownerID: ownerID,
+          ));
     }
   }
 

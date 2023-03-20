@@ -18,6 +18,7 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
       userType: json['userType'] as int?,
       deviceToken: json['deviceToken'] as String?,
       memberShipPlan: json['memberShipPlan'] as int?,
+      isGymDetailsFilled: json['isGymDetailsFilled'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
@@ -32,4 +33,5 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
       'deviceToken': instance.deviceToken,
       'userType': instance.userType,
       'memberShipPlan': instance.memberShipPlan,
+      'isGymDetailsFilled': instance.isGymDetailsFilled,
     };

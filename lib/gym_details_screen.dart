@@ -132,7 +132,7 @@ class _GymDetailsScreenState extends State<GymDetailsScreen> {
                     ownerId: widget.ownerID,
                   );
                   await Database()
-                      .createGymDetails(gymDetails.toJson(), gymUserID(), context);
+                      .createGymDetails(gymDetails, context);
 
                   _gymNameController.clear();
                   _gymAddressController.clear();

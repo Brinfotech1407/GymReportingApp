@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gim_app/models/gym_details.dart';
 import 'package:gim_app/models/user.dart';
 import 'package:gim_app/services/notification_service.dart';
 import 'package:gim_app/services/preference_service.dart';
@@ -16,12 +17,12 @@ class Database {
   FirebaseAuth auth = FirebaseAuth.instance;
 
 
-  Future<String> createNewUser(
-      UserModel userData, String emailId,BuildContext context) async {
+  Future<String?> createNewUser(
+      UserModel userData,BuildContext context) async {
     try {
       var querySnapshot = await _firestore
           .collection("users")
-          .where('email', isEqualTo: emailId)
+          .where('email', isEqualTo: userData.email)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
@@ -38,7 +39,7 @@ class Database {
         // Add user data to Firestore
         await _firestore
             .collection("users")
-            .doc(emailId)
+            .doc(userData.email)
             .set(userData.toJson(), SetOptions(merge: true));
 
         if(userData.email !=null  && userData.password !=null) {
@@ -49,7 +50,7 @@ class Database {
     } on Exception catch (e) {
       log('Exception $e');
     }
-    return emailId;
+    return userData.email;
   }
 
   Future<UserModel?> getUser(String uid) async {
@@ -57,7 +58,6 @@ class Database {
       final DocumentSnapshot<Map<String, dynamic>> doc =
           await _firestore.collection('users').doc(uid).get();
       final UserModel user = UserModel.fromJson(doc.data()!);
-      print('get the userData $user');
       return user;
     } catch (e) {
       throw Exception(e.toString());
@@ -65,22 +65,20 @@ class Database {
   }
 
 
-  Future<String> createGymDetails(
-      Map<String, dynamic>? gymData, String uid,BuildContext context) async {
-    if (gymData != null) {
-      try {
-          // Add user data to Firestore
-          await _firestore
-              .collection("gym")
-              .doc(uid)
-              .set(gymData, SetOptions(merge: true));
+  Future<String?> createGymDetails(
+      GymDetailsModel gymData,BuildContext context) async {
+    try {
+        // Add user data to Firestore
+        await _firestore
+            .collection("gym")
+            .doc(gymData.id)
+            .set(gymData.toJson(), SetOptions(merge: true));
 
-          _preferenceService.setBool(PreferenceService.ownerGymDetailsFiled, true);
+        _preferenceService.setBool(PreferenceService.ownerGymDetailsFiled, true);
 
-      } on Exception catch (e) {
-        log('Exception $e');
-      }
+    } on Exception catch (e) {
+      log('Exception $e');
     }
-    return uid;
+    return gymData.id;
   }
 }

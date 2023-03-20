@@ -283,7 +283,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         userType: userTypeController.userType.value,
                       );
                       await Database()
-                          .createNewUser(userData, userData.email!, context);
+                          .createNewUser(userData, context);
 
                       _emailController.clear();
                       _pwdController.clear();

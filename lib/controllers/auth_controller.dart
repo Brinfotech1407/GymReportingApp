@@ -71,18 +71,18 @@ class AuthController extends GetxController {
         );
       }
 
-      _preferenceService.setString(PreferenceService.userEmail, user.email);
+      await _preferenceService.setString(PreferenceService.userEmail, user.email);
 
-      _preferenceService.setString(
+      await _preferenceService.setString(
           PreferenceService.userName, '${user.firstName} ${user.lastName}');
 
-      _preferenceService.setBool(PreferenceService.userLoggedIN, true);
+      await  _preferenceService.setBool(PreferenceService.userLoggedIN, true);
 
-      _preferenceService.setInt(PreferenceService.userType, user.userType);
+      await  _preferenceService.setInt(PreferenceService.userType, user.userType);
 
-      _preferenceService.setString(PreferenceService.userID, user.id);
+      await  _preferenceService.setString(PreferenceService.userID, user.id);
 
-      _preferenceService.setBool(
+      await _preferenceService.setBool(
           PreferenceService.ownerGymDetailsFiled, user.isGymDetailsFilled);
 
 

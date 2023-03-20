@@ -74,7 +74,7 @@ class Database {
           .doc(gymData.id)
           .set(gymData.toJson(), SetOptions(merge: true));
 
-      //TODO : find user first, updated gym Details
+      //TODO : find user first according to owner id, updated gym Details
 
       final snapshot = await _firestore.collection('users').get();
 
@@ -86,6 +86,8 @@ class Database {
           .collection('users')
           .doc(user.email)
           .update({'isGymDetailsFilled': true});
+
+      //Todo: needs to set true here as well in sharedprefrence
 
 
     } on Exception catch (e) {

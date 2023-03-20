@@ -57,9 +57,11 @@ class _HomeScreenState extends State<HomeScreen>
                           onPressed: () async {
                             QuickAlert.show(
                               context: context,
-                              type: QuickAlertType.warning,
+                              type: QuickAlertType.confirm,
                               title: '',
-                              text: 'logout',
+                                cancelBtnText: 'No',
+                                confirmBtnText: 'yes',
+                                text: "Are you sure you want to log out? Your session will be terminated and you will need to log in again to use the app.",
                               onConfirmBtnTap: () {
                                 AuthController.instance.logout();
                                 Get.to(() => const LoginScreen());

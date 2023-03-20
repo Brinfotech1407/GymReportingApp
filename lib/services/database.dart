@@ -18,8 +18,6 @@ class Database {
 
   Future<String> createNewUser(
       UserModel userData, String emailId,BuildContext context) async {
-    await _preferenceService.init();
-    await _preferenceService.setUserEmail(emailId);
     try {
       var querySnapshot = await _firestore
           .collection("users")

@@ -18,23 +18,10 @@ class PreferenceService {
     _preferences = await SharedPreferences.getInstance();
   }
 
-  Future<void> setUserEmail(String userPhoneNo) async {
-    await _preferences?.setString(userEmail, userPhoneNo);
-  }
 
-  String? getUserEmail(String key) {
-    return _preferences?.getString(key);
+  Future<void> clearSharedPreference() async {
+    await _preferences?.clear();
   }
-
-  Future<void> setUserType(bool userTypeValue) async {
-    await _preferences?.setBool(userType, userTypeValue);
-  }
-
-  bool getUserType() {
-    return _preferences?.getBool(userType) ?? false;
-  }
-
-  ////Todo Ramu code
 
   Future<bool>? setString(String key, String? value) {
     return _preferences?.setString(key, value ?? '');

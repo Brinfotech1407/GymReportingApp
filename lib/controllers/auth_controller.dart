@@ -103,8 +103,7 @@ class AuthController extends GetxController {
   }
 
   void logout() async {
-    _preferenceService.setBool(PreferenceService.userLoggedIN, false);
-    _preferenceService.setBool(PreferenceService.ownerGymDetailsFiled, false);
+    await _preferenceService.clearSharedPreference();
     await auth.signOut();
   }
 }

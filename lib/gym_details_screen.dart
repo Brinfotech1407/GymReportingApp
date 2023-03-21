@@ -115,28 +115,15 @@ class _GymDetailsScreenState extends State<GymDetailsScreen> {
               buttonName: 'Submit',
               onSubmitBtnTap: () async {
                 isLoaded.toggle();
-                if (_gymContactNoController.text.isNotEmpty &&
-                    _gymAddressController.text.isNotEmpty &&
-                    _gymNameController.text.isNotEmpty) {
+                if (isDataNotEmpty()) {
                   if (isLoaded.value == true) {
                     Get.to(const LoaderScreen(
                       isFullScreen: true,
                     ));
                   }
-                  final GymDetailsModel gymDetails = GymDetailsModel(
-                    id: gymUserID(),
-                    name: _gymNameController.text,
-                    address: _gymAddressController.text,
-                    capacity: capacityController.capacity.value,
-                    contactNo: _gymContactNoController.text,
-                    ownerId: widget.ownerID,
-                  );
-                  await Database()
-                      .createGymDetails(gymDetails, context);
+                  await setGymDetails(context);
 
-                  _gymNameController.clear();
-                  _gymAddressController.clear();
-                  _gymContactNoController.clear();
+                  clearGymControllervalue();
                   isLoaded.value = false;
                   Get.to(() => const GymOwnerHomeScreen());
                 }
@@ -146,6 +133,31 @@ class _GymDetailsScreenState extends State<GymDetailsScreen> {
         ),
       ),
     ));
+  }
+
+  Future<void> setGymDetails(BuildContext context) async {
+     final GymDetailsModel gymDetails = GymDetailsModel(
+      id: gymUserID(),
+      name: _gymNameController.text,
+      address: _gymAddressController.text,
+      capacity: capacityController.capacity.value,
+      contactNo: _gymContactNoController.text,
+      ownerId: widget.ownerID,
+    );
+    await Database()
+        .createGymDetails(gymDetails, context);
+  }
+
+  bool isDataNotEmpty() {
+    return _gymContactNoController.text.isNotEmpty &&
+                  _gymAddressController.text.isNotEmpty &&
+                  _gymNameController.text.isNotEmpty;
+  }
+
+  void clearGymControllervalue() {
+     _gymNameController.clear();
+    _gymAddressController.clear();
+    _gymContactNoController.clear();
   }
 
   String gymUserID() {

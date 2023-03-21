@@ -100,28 +100,13 @@ class _HomeScreenState extends State<HomeScreen>
                       scannerId = barcodes.barcodes.first.rawValue;
                       if (scannerId !=null && scannerId!.isNotEmpty ) {
                         cameraController.stop();
-
                         isLoaded.toggle();
-                        GymReportModel gymReport = GymReportModel(
-                            id: gymUserID(),
-                            gymId: barcodes.barcodes.first.rawValue!,
-                            userId: widget.currentUserID,
-                            date: formattedDate,
-                            signInTime: formattedTime,
-                            signOutTime: '0',
-                            isUserSignedOutForDay: false);
-
-                        if (isLoaded.value == true) {
-                          Get.to(const LoaderScreen(
-                            isFullScreen: true,
-                          ));
-                        }
-                        await Database().createGymReport(gymReport, context);
+                        showWaitingScreen();
+                        await createGymReport(barcodes, formattedDate, formattedTime, context);
                         isLoaded.value = false;
                       }else{
                         cameraController.start();
                       }
-
                       debugPrint('Barcode found! $scannerId');
                     }),
                 const QRScannerOverlay(overlayColour: Colors.white),
@@ -138,6 +123,28 @@ class _HomeScreenState extends State<HomeScreen>
         ),
       ],
     )));
+  }
+
+  void showWaitingScreen() {
+     if (isLoaded.value == true) {
+      Get.to(const LoaderScreen(
+        isFullScreen: true,
+      ));
+    }
+  }
+
+  Future<void> createGymReport(BarcodeCapture barcodes, String formattedDate, String formattedTime, BuildContext context) async {
+    GymReportModel gymReport = GymReportModel(
+        id: gymUserID(),
+        gymId: barcodes.barcodes.first.rawValue!,
+        userId: widget.currentUserID,
+        date: formattedDate,
+        signInTime: formattedTime,
+        signOutTime: '0',
+        isUserSignedOutForDay: false);
+
+
+    await Database().createGymReport(gymReport, context);
   }
 
   String gymUserID() {

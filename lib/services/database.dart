@@ -56,10 +56,17 @@ class Database {
 
   Future<UserModel?> getUser(String uid) async {
     try {
-      final DocumentSnapshot<Map<String, dynamic>> doc =
-          await _firestore.collection('users').doc(uid).get();
-      final UserModel user = UserModel.fromJson(doc.data()!);
-      return user;
+      final DocumentSnapshot<Map<String, dynamic>> doc = (await _firestore
+          .collection('users')
+          .where('id', isEqualTo: uid)
+          .get()) as DocumentSnapshot<Map<String, dynamic>>;
+
+      if (doc.exists) {
+        final UserModel user = UserModel.fromJson(doc.data()!);
+        return user;
+      } else {
+        return null;
+      }
     } catch (e) {
       throw Exception(e.toString());
     }
@@ -74,7 +81,7 @@ class Database {
           .doc(gymData.id)
           .set(gymData.toJson(), SetOptions(merge: true));
 
-     //below code is get user and update the isGymDetailsFilled true
+      //below code is get user and update the isGymDetailsFilled true
 
       var querySnapshot = await _firestore
           .collection("users")
@@ -86,22 +93,16 @@ class Database {
       if (userDocs.isNotEmpty) {
         var userDocRef = userDocs.first.reference;
 
-
         await userDocRef.update({'isGymDetailsFilled': true});
 
-
-         await _preferenceService.setBool(
-          PreferenceService.ownerGymDetailsFiled, true);
-
-
+        await _preferenceService.setBool(
+            PreferenceService.ownerGymDetailsFiled, true);
       }
-
     } on Exception catch (e) {
       log('Exception $e');
     }
     return gymData.id;
   }
-
 
   Future<String?> createGymReport(
       GymReportModel gymReportData, BuildContext context) async {
@@ -111,7 +112,6 @@ class Database {
           .collection("gym_report")
           .doc(gymReportData.id)
           .set(gymReportData.toJson(), SetOptions(merge: true));
-
     } on Exception catch (e) {
       log('Exception $e');
     }

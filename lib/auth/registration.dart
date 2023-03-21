@@ -210,47 +210,54 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   ),
                 ],
               ),
-              Container(
-                margin: const EdgeInsets.only(
-                    left: 18, top: 14, bottom: 8, right: 18),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        alignment: Alignment.centerLeft,
-                        child: const Text(
-                          'Membership Plan',
-                          textAlign: TextAlign.right,
-                          style: TextStyle(fontSize: 17, color: Colors.white),
-                        ),
+
+              Obx(
+                    () => userTypeController.userType.value == 0
+                    ?  Container(
+                      margin: const EdgeInsets.only(
+                          left: 18, top: 14, bottom: 8, right: 18),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              alignment: Alignment.centerLeft,
+                              child: const Text(
+                                'Membership Plan',
+                                textAlign: TextAlign.right,
+                                style: TextStyle(fontSize: 17, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                          Obx(
+                                () => Padding(
+                              padding: const EdgeInsets.only(right: 12),
+                              child: DropdownButton<int>(
+                                iconDisabledColor: Colors.white,
+                                iconEnabledColor: Colors.white,
+                                dropdownColor: Colors.blueGrey,
+                                icon: const Icon(Icons.keyboard_arrow_down),
+                                items: itemList.map((int items) {
+                                  return DropdownMenuItem(
+                                    value: items,
+                                    child: Text('$items Months',
+                                        style: const TextStyle(
+                                            color: Colors.white, fontSize: 14)),
+                                  );
+                                }).toList(),
+                                onChanged: (int? newValue) {
+                                  dropdownValue.value = newValue!;
+                                },
+                                value: dropdownValue.value,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    Obx(
-                      () => Padding(
-                        padding: const EdgeInsets.only(right: 12),
-                        child: DropdownButton<int>(
-                          iconDisabledColor: Colors.white,
-                          iconEnabledColor: Colors.white,
-                          dropdownColor: Colors.blueGrey,
-                          icon: const Icon(Icons.keyboard_arrow_down),
-                          items: itemList.map((int items) {
-                            return DropdownMenuItem(
-                              value: items,
-                              child: Text('$items Months',
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 14)),
-                            );
-                          }).toList(),
-                          onChanged: (int? newValue) {
-                            dropdownValue.value = newValue!;
-                          },
-                          value: dropdownValue.value,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                    )
+                    : Container(),
               ),
+
+
               GymUtils().buildButtonView(
                   context: context,
                   onSubmitBtnTap: () async {

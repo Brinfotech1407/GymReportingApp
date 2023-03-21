@@ -5,11 +5,13 @@ import 'package:gim_app/controllers/auth_controller.dart';
 import 'package:gim_app/models/gym_report_model.dart';
 import 'package:gim_app/qr_scanner_overlay.dart';
 import 'package:gim_app/services/database.dart';
+import 'package:gim_app/thank_you.dart';
 import 'package:gim_app/waiting/LoaderScreen.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:uuid/uuid.dart';
+// ignore: depend_on_referenced_packages
 import "package:intl/intl.dart";
 
 class HomeScreen extends StatefulWidget {
@@ -99,6 +101,10 @@ class _HomeScreenState extends State<HomeScreen>
                           // ignore: use_build_context_synchronously
                           await Database().updateGymReportData(
                               widget.currentUserID, formattedTime, context);
+
+                          Future.delayed(const Duration( seconds: 5), () {
+                            Get.to(const ThankYouScreen());
+                          });
                         } else {
                           // ignore: use_build_context_synchronously
                           await createGymReport(

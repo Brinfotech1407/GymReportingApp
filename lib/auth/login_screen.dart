@@ -18,7 +18,6 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   RxBool isLoaded = false.obs;
 
   @override

@@ -10,7 +10,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:uuid/uuid.dart';
-import 'package:intl/intl.dart';
+import "package:intl/intl.dart";
 
 class HomeScreen extends StatefulWidget {
   final String currentUserID;
@@ -65,18 +65,7 @@ class _HomeScreenState extends State<HomeScreen>
             padding: const EdgeInsets.only(bottom: 18),
             child: IconButton(
                 onPressed: () async {
-                  QuickAlert.show(
-                      context: context,
-                      type: QuickAlertType.confirm,
-                      title: '',
-                      cancelBtnText: 'No',
-                      confirmBtnText: 'yes',
-                      text:
-                          "Are you sure you want to log out? Your session will be terminated and you will need to log in again to use the app.",
-                      onConfirmBtnTap: () {
-                        AuthController.instance.logout();
-                        Get.to(() => const LoginScreen());
-                      });
+                  showAlertDialog(context);
                 },
                 icon: const Icon(Icons.logout)),
           ),
@@ -96,15 +85,28 @@ class _HomeScreenState extends State<HomeScreen>
               children: [
                 MobileScanner(
                     controller: cameraController,
-                    onDetect: (barcodes) async {
+                    onDetect: (barcodes)  async {
                       scannerId = barcodes.barcodes.first.rawValue;
-                      if (scannerId !=null && scannerId!.isNotEmpty ) {
+                      if (scannerId != null && scannerId!.isNotEmpty) {
                         cameraController.stop();
                         isLoaded.toggle();
                         showWaitingScreen();
-                        await createGymReport(barcodes, formattedDate, formattedTime, context);
+
+                     GymReportModel? gymData = await Database().getGymReportData(widget.currentUserID);
+
+                        if (gymData != null && gymData.userId.isNotEmpty  &&
+                            gymData.date == formattedDate) {
+                          // ignore: use_build_context_synchronously
+                          await Database().updateGymReportData(
+                              widget.currentUserID, formattedTime, context);
+                        } else {
+                          // ignore: use_build_context_synchronously
+                          await createGymReport(
+                              barcodes, formattedDate, formattedTime, context);
+                        }
+
                         isLoaded.value = false;
-                      }else{
+                      } else {
                         cameraController.start();
                       }
                       debugPrint('Barcode found! $scannerId');
@@ -125,15 +127,31 @@ class _HomeScreenState extends State<HomeScreen>
     )));
   }
 
+  void showAlertDialog(BuildContext context) {
+    QuickAlert.show(
+        context: context,
+        type: QuickAlertType.confirm,
+        title: '',
+        cancelBtnText: 'No',
+        confirmBtnText: 'yes',
+        text:
+            "Are you sure you want to log out? Your session will be terminated and you will need to log in again to use the app.",
+        onConfirmBtnTap: () {
+          AuthController.instance.logout();
+          Get.to(() => const LoginScreen());
+        });
+  }
+
   void showWaitingScreen() {
-     if (isLoaded.value == true) {
+    if (isLoaded.value == true) {
       Get.to(const LoaderScreen(
         isFullScreen: true,
       ));
     }
   }
 
-  Future<void> createGymReport(BarcodeCapture barcodes, String formattedDate, String formattedTime, BuildContext context) async {
+  Future<void> createGymReport(BarcodeCapture barcodes, String formattedDate,
+      String formattedTime, BuildContext context) async {
     GymReportModel gymReport = GymReportModel(
         id: gymUserID(),
         gymId: barcodes.barcodes.first.rawValue!,
@@ -142,7 +160,6 @@ class _HomeScreenState extends State<HomeScreen>
         signInTime: formattedTime,
         signOutTime: '0',
         isUserSignedOutForDay: false);
-
 
     await Database().createGymReport(gymReport, context);
   }

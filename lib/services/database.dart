@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:gim_app/models/gym_details.dart';
 import 'package:gim_app/models/gym_report_model.dart';
 import 'package:gim_app/models/user.dart';
@@ -16,6 +17,9 @@ class Database {
   final PreferenceService _preferenceService = PreferenceService();
   NotificationServices notificationServices = NotificationServices();
   FirebaseAuth auth = FirebaseAuth.instance;
+
+  RxList<DocumentSnapshot<Map<String, dynamic>>> myData =
+  RxList<DocumentSnapshot<Map<String, dynamic>>>();
 
   Future<String?> createNewUser(
       UserModel userData, BuildContext context) async {
@@ -116,5 +120,44 @@ class Database {
       log('Exception $e');
     }
     return gymReportData.id;
+  }
+
+  Future<GymReportModel?> getGymReportData(String uid) async {
+    try {
+      final  QuerySnapshot<Map<String, dynamic>> doc = (
+          await _firestore
+          .collection('gym_report')
+          .where('userId', isEqualTo: uid)
+          .get());
+
+      if (doc.docs.isNotEmpty) {
+        final GymReportModel user = GymReportModel.fromJson(doc.docs.first.data());
+        return user;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<String?> updateGymReportData(
+      String ownerId, String formattedTime, BuildContext context) async {
+    try {
+      var querySnapshot = await _firestore
+          .collection("gym_report")
+          .where('userId', isEqualTo: ownerId)
+          .get();
+
+      var userDocs = querySnapshot.docs;
+
+      var userDocRef = userDocs.first.reference;
+
+      await userDocRef.update(
+          {'signOutTime': formattedTime, 'isUserSignedOutForDay': true});
+    } on Exception catch (e) {
+      log('Exception $e');
+    }
+    return ownerId;
   }
 }

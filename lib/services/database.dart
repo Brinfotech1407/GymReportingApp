@@ -74,21 +74,27 @@ class Database {
           .doc(gymData.id)
           .set(gymData.toJson(), SetOptions(merge: true));
 
-      //TODO : find user first according to owner id, updated gym Details
+     //below code is get user and update the isGymDetailsFilled true
 
-      final snapshot = await _firestore.collection('users').get();
+      var querySnapshot = await _firestore
+          .collection("users")
+          .where('id', isEqualTo: gymData.ownerId)
+          .get();
 
-      final userDoc = snapshot.docs.last;
-      UserModel user = UserModel.fromJson(userDoc.data());
-      user.isGymDetailsFilled = true;
+      var userDocs = querySnapshot.docs;
 
-      await _firestore
-          .collection('users')
-          .doc(user.email)
-          .update({'isGymDetailsFilled': true});
+      if (userDocs.isNotEmpty) {
+        var userDocRef = userDocs.first.reference;
 
-      //Todo: needs to set true here as well in sharedprefrence
 
+        await userDocRef.update({'isGymDetailsFilled': true});
+
+
+         await _preferenceService.setBool(
+          PreferenceService.ownerGymDetailsFiled, true);
+
+
+      }
 
     } on Exception catch (e) {
       log('Exception $e');

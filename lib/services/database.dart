@@ -122,7 +122,7 @@ class Database {
     return gymReportData.id;
   }
 
-  Future<GymReportModel?> getGymReportData(String uid) async {
+  Future<GymReportModel?> getSingleGymReportData(String uid) async {
     try {
       final  QuerySnapshot<Map<String, dynamic>> doc = (
           await _firestore

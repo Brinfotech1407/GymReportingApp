@@ -94,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen>
                         isLoaded.toggle();
                         showWaitingScreen();
 
-                     GymReportModel? gymData = await Database().getGymReportData(widget.currentUserID);
+                     GymReportModel? gymData = await Database().getSingleGymReportData(widget.currentUserID);
 
                         if (gymData != null && gymData.userId.isNotEmpty  &&
                             gymData.date == formattedDate) {

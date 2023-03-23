@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:gim_app/auth/login_screen.dart';
 import 'package:gim_app/Home/gym_owner_home_screen.dart';
 import 'package:gim_app/Home/home_screen.dart';
+import 'package:gim_app/auth/login_screen.dart';
 import 'package:gim_app/gym_details_screen.dart';
 import 'package:gim_app/utils/app_constant.dart';
+import 'package:quickalert/quickalert.dart';
 
 class GymUtils {
   BoxDecoration buildBoxDecoration() {
@@ -29,8 +30,9 @@ class GymUtils {
         style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
             elevation: 3,
-            shape:  RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(60),)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(60),
+            )),
         onPressed: () {
           onSubmitBtnTap();
         },
@@ -38,7 +40,6 @@ class GymUtils {
           buttonName,
           style: const TextStyle(color: Colors.black, fontSize: 20),
         ),
-
       ),
     );
   }
@@ -110,14 +111,18 @@ class GymUtils {
       required String ownerID,
       required bool ownerGymDetailsFiled}) {
     if (userType == AppConstant.userTypeNormal) {
-      Get.to(() =>  HomeScreen(currentUserID: ownerID,));
+      Get.to(() => HomeScreen(
+            currentUserID: ownerID,
+          ));
     } else {
-      showOwnerScreens(ownerGymDetailsFiled: ownerGymDetailsFiled,ownerID:  ownerID);
+      showOwnerScreens(
+          ownerGymDetailsFiled: ownerGymDetailsFiled, ownerID: ownerID);
     }
   }
 
-  void showOwnerScreens({required bool ownerGymDetailsFiled, required String ownerID}) {
-      if (ownerGymDetailsFiled) {
+  void showOwnerScreens(
+      {required bool ownerGymDetailsFiled, required String ownerID}) {
+    if (ownerGymDetailsFiled) {
       Get.to(() => const GymOwnerHomeScreen());
     } else {
       Get.to(() => GymDetailsScreen(
@@ -128,5 +133,19 @@ class GymUtils {
 
   void redirectToLoginScreen() {
     Get.to(() => const LoginScreen());
+  }
+
+  void showAlertDialog({
+    required BuildContext context,
+    required String title,
+    required String desc,
+    required String confirmText,
+  }) {
+    QuickAlert.show(
+        context: context,
+        type: QuickAlertType.error,
+        title: title,
+        confirmBtnText: confirmText,
+        text: desc);
   }
 }

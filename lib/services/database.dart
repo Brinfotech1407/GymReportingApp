@@ -19,7 +19,7 @@ class Database {
   FirebaseAuth auth = FirebaseAuth.instance;
 
   RxList<DocumentSnapshot<Map<String, dynamic>>> myData =
-  RxList<DocumentSnapshot<Map<String, dynamic>>>();
+      RxList<DocumentSnapshot<Map<String, dynamic>>>();
 
   Future<String?> createNewUser(
       UserModel userData, BuildContext context) async {
@@ -124,14 +124,14 @@ class Database {
 
   Future<GymReportModel?> getSingleGymReportData(String uid) async {
     try {
-      final  QuerySnapshot<Map<String, dynamic>> doc = (
-          await _firestore
+      final QuerySnapshot<Map<String, dynamic>> doc = (await _firestore
           .collection('gym_report')
           .where('userId', isEqualTo: uid)
           .get());
 
       if (doc.docs.isNotEmpty) {
-        final GymReportModel user = GymReportModel.fromJson(doc.docs.first.data());
+        final GymReportModel user =
+            GymReportModel.fromJson(doc.docs.first.data());
         return user;
       } else {
         return null;
@@ -143,14 +143,14 @@ class Database {
 
   Future<GymDetailsModel?> isGymPresent(String uid) async {
     try {
-      final  QuerySnapshot<Map<String, dynamic>> doc = (
-          await _firestore
+      final QuerySnapshot<Map<String, dynamic>> doc = (await _firestore
           .collection('gym')
           .where('id', isEqualTo: uid)
           .get());
 
       if (doc.docs.isNotEmpty) {
-        final GymDetailsModel gymDetailsModel = GymDetailsModel.fromJson(doc.docs.first.data());
+        final GymDetailsModel gymDetailsModel =
+            GymDetailsModel.fromJson(doc.docs.first.data());
         return gymDetailsModel;
       } else {
         return null;
@@ -160,12 +160,44 @@ class Database {
     }
   }
 
-  Future<String?> updateGymReportData(
-      String ownerId, String formattedTime, BuildContext context) async {
+  Future<int> checkUserAlreadySignedIn(
+    String uid,
+    String gymID,
+    String currentDate,
+  ) async {
+    try {
+      final QuerySnapshot<Map<String, dynamic>> doc = (await _firestore
+          .collection('gym_report')
+          .where('userId', isEqualTo: uid)
+          .where('gymId', isEqualTo: gymID)
+          .where('date', isEqualTo: currentDate)
+          .get());
+
+      if (doc.docs.isNotEmpty) {
+        final GymReportModel gymReportModel =
+            GymReportModel.fromJson(doc.docs.first.data());
+
+        return gymReportModel.isUserSignedOutForDay ? 2 : 1;
+      } else {
+        return 0;
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<String?> updateGymReportData({
+    required String ownerId,
+    required String formattedTime,
+    required String gymId,
+    required String date,
+  }) async {
     try {
       var querySnapshot = await _firestore
           .collection("gym_report")
           .where('userId', isEqualTo: ownerId)
+          .where("gymId", isEqualTo: gymId)
+          .where("date", isEqualTo: date)
           .get();
 
       var userDocs = querySnapshot.docs;

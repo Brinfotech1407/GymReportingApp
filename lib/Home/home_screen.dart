@@ -6,14 +6,15 @@ import 'package:gim_app/models/gym_details.dart';
 import 'package:gim_app/models/gym_report_model.dart';
 import 'package:gim_app/qr_scanner_overlay.dart';
 import 'package:gim_app/services/database.dart';
+import 'package:gim_app/utils/date_time_utils.dart';
+import 'package:gim_app/utils/gym_utils.dart';
 import 'package:gim_app/waiting/LoaderScreen.dart';
-
-// ignore: depend_on_referenced_packages
-import "package:intl/intl.dart";
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:uuid/uuid.dart';
+
+import '../thank_you.dart';
 
 class HomeScreen extends StatefulWidget {
   final String currentUserID;
@@ -32,7 +33,6 @@ class _HomeScreenState extends State<HomeScreen>
 
   RxBool isStarted = true.obs;
   RxBool isLoaded = false.obs;
-  DateTime now = DateTime.now();
 
   @override
   void dispose() {
@@ -86,77 +86,8 @@ class _HomeScreenState extends State<HomeScreen>
                   controller: cameraController,
                   fit: BoxFit.contain,
                   onDetect: (barcode) async {
-                    RxString formattedDate =
-                        DateFormat('yyyy-MM-dd').format(now).obs;
-                    RxString formattedTime =
-                        DateFormat('HH:mm:ss').format(now).obs;
-
-                    scannerId.value = barcode.barcodes.first.rawValue!;
-
-                    print(scannerId.value);
-
-                    if (scannerId.isNotEmpty) {
-                      cameraController.stop();
-                      isLoaded.value = true;
-
-                      GymDetailsModel? gymDetails =
-                          await Database().isGymPresent(scannerId.value);
-                      if (gymDetails != null) {
-                        QuickAlert.show(
-                          context: context,
-                          type: QuickAlertType.error,
-                          title: '',
-                          text: "Gym Found",
-                        );
-                      } else {
-                        QuickAlert.show(
-                          context: context,
-                          type: QuickAlertType.error,
-                          title: '',
-                          text:
-                              "Sorry, Gym not found please try another QRCode",
-                        );
-                      }
-                      isLoaded.value = false;
-                      cameraController.start();
-                    }
-
-                    /*GymReportModel? gymData;
-
-                      gymData = await Database()
-                          .getSingleGymReportData(widget.currentUserID);
-
-                      if (gymData != null &&
-                          gymData.gymId == scannerId.value &&
-                          gymData.isUserSignedOutForDay == true) {
-                        QuickAlert.show(
-                          context: context,
-                          type: QuickAlertType.error,
-                          title: '',
-                          text:
-                              "Sorry, you have already signed in and out of the gym today. You cannot enter the gym again.",
-                        );
-                      } else if (gymData != null &&
-                          widget.currentUserID == gymData.userId &&
-                          gymData.signInTime != formattedTime.value &&
-                          gymData.date == formattedDate.value &&
-                          gymData.isUserSignedOutForDay == false &&
-                          gymData.gymId == scannerId.value) {
-                        // ignore: use_build_context_synchronously
-                        await Database().updateGymReportData(
-                            widget.currentUserID, formattedTime.value, context);
-
-                        Get.to(const ThankYouScreen());
-                      } else {
-                        // ignore: use_build_context_synchronously
-                        await createGymReport(barcode, formattedDate.value,
-                            formattedTime.value, context);
-
-                        Get.to(const ThankYouScreen());
-                      }
-                      isLoaded.value = false;
-                    }
-                    cameraController.start();*/
+                    cameraController.stop();
+                    processQRCode(barcode.barcodes.first.rawValue!, context);
                   },
                 ),
                 QRScannerOverlay(
@@ -174,6 +105,63 @@ class _HomeScreenState extends State<HomeScreen>
         ),
       ],
     )));
+  }
+
+  Future<void> processQRCode(String scanID, BuildContext context) async {
+    scannerId.value = scanID;
+    isLoaded.value = true;
+
+    if (scannerId.isNotEmpty) {
+      bool isPresent = await checkIfGymAlreadyPresent(context);
+      if (isPresent) {
+        String currentDate = DateTimeUtils().getCurrentDate();
+        String time = DateTimeUtils().getCurrentTime();
+
+        int userStatus = await Database().checkUserAlreadySignedIn(
+            widget.currentUserID, scanID, currentDate);
+
+        if (userStatus == 1) {
+          //update
+          await Database().updateGymReportData(
+            formattedTime: time,
+            date: currentDate,
+            gymId: scanID,
+            ownerId: widget.currentUserID,
+          );
+          Get.to(const ThankYouScreen());
+        } else if (userStatus == 0) {
+          //insert
+          await createGymReport(
+            gymID: scanID,
+            context: context,
+            formattedDate: currentDate,
+            formattedTime: time,
+          );
+          Get.to(const ThankYouScreen());
+        } else if (userStatus == 2) {
+          //Todo User Already signed in and signed out for
+          GymUtils().showAlertDialog(
+            context: context,
+            title: '',
+            desc: 'User Already Signed In and Signed Out For Today, thanks',
+            confirmText: 'Okay',
+          );
+        }
+      } else {
+        //Todo GYM not found message needs to show Gym Not Found
+      }
+      isLoaded.value = false;
+      //Todo Needs to add 3 second Delay and then start camera
+      cameraController.start();
+    } else {
+      //Todo GYM not found message needs to show invalid QRCod
+    }
+  }
+
+  Future<bool> checkIfGymAlreadyPresent(BuildContext context) async {
+    GymDetailsModel? gymDetails =
+        await Database().isGymPresent(scannerId.value);
+    return gymDetails != null;
   }
 
   void showAlertDialog(BuildContext context) {
@@ -203,16 +191,21 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
-  Future<void> createGymReport(BarcodeCapture barcodes, String formattedDate,
-      String formattedTime, BuildContext context) async {
+  Future<void> createGymReport({
+    required String gymID,
+    required String formattedDate,
+    required String formattedTime,
+    required BuildContext context,
+  }) async {
     GymReportModel gymReport = GymReportModel(
-        id: gymUserID(),
-        gymId: barcodes.barcodes.first.rawValue!,
-        userId: widget.currentUserID,
-        date: formattedDate,
-        signInTime: formattedTime,
-        signOutTime: '0',
-        isUserSignedOutForDay: false);
+      id: gymUserID(),
+      gymId: gymID,
+      userId: widget.currentUserID,
+      date: formattedDate,
+      signInTime: formattedTime,
+      signOutTime: '0',
+      isUserSignedOutForDay: false,
+    );
 
     await Database().createGymReport(gymReport, context);
   }

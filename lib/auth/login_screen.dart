@@ -5,7 +5,6 @@ import 'package:gim_app/controllers/auth_controller.dart';
 import 'package:gim_app/utils/gym_utils.dart';
 import 'package:gim_app/waiting/LoaderScreen.dart';
 
-
 class LoginScreen extends StatefulWidget {
   final String? ownerID;
 
@@ -77,7 +76,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   textInputType: TextInputType.emailAddress,
                   keyboardType: TextInputType.emailAddress,
                   validator: (String? value) {
-                    const pattern = r"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'"
+                    const pattern =
+                        r"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'"
                         r'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-'
                         r'\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*'
                         r'[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4]'
@@ -122,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         _pwdController.text.isNotEmpty) {
                       if (isLoaded.value == true) {
                         Get.to(const LoaderScreen(
-                          isFullScreen: true,
+                          isFullScreen: false,
                         ));
                       }
                       isLoaded.value = false;

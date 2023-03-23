@@ -271,7 +271,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         _phoneController.text.isNotEmpty) {
                       if (isLoaded.value == true) {
                         Get.to(const LoaderScreen(
-                          isFullScreen: true,
+                          isFullScreen: false,
                         ));
                       }
                       final UserModel userData = UserModel(

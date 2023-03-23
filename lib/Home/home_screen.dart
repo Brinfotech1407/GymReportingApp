@@ -82,7 +82,6 @@ class _HomeScreenState extends State<HomeScreen>
             child: Stack(
               alignment: Alignment.center,
               children: [
-                showWaitingScreen(),
                 MobileScanner(
                   controller: cameraController,
                   fit: BoxFit.contain,
@@ -96,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen>
 
                     if (scannerId.isNotEmpty) {
                       cameraController.stop();
-
+                      isLoaded.value = true;
                       GymReportModel? gymData;
 
                       gymData = await Database()
@@ -118,25 +117,26 @@ class _HomeScreenState extends State<HomeScreen>
                           gymData.date == formattedDate.value &&
                           gymData.isUserSignedOutForDay == false &&
                           gymData.gymId == scannerId.value) {
-                        isLoaded.value = true;
+
                         // ignore: use_build_context_synchronously
                         await Database().updateGymReportData(
                             widget.currentUserID, formattedTime.value, context);
-                        isLoaded.value = false;
+
                         Get.to(const ThankYouScreen());
                       } else {
-                        isLoaded.value = true;
+
                         // ignore: use_build_context_synchronously
                         await createGymReport(barcode, formattedDate.value,
                             formattedTime.value, context);
-                        isLoaded.value = false;
+
                         Get.to(const ThankYouScreen());
                       }
+                      isLoaded.value = false;
                     }
                     cameraController.start();
                   },
                 ),
-                const QRScannerOverlay(overlayColour: Colors.white),
+                 QRScannerOverlay(overlayColour: Colors.white,isLoaded: isLoaded.value),
               ],
             ),
           ),

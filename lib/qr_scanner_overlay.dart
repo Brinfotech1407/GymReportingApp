@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:gim_app/waiting/LoaderScreen.dart';
 
 class QRScannerOverlay extends StatelessWidget {
-  const QRScannerOverlay({Key? key, required this.overlayColour})
+   QRScannerOverlay({Key? key, required this.overlayColour,required this.isLoaded})
       : super(key: key);
 
   final Color overlayColour;
+  bool isLoaded;
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +17,7 @@ class QRScannerOverlay extends StatelessWidget {
     return Stack(
       alignment: Alignment.center,
         children: [
+          showWaitingScreen(),
       ColorFiltered(
         colorFilter: ColorFilter.mode(
             overlayColour, BlendMode.srcOut), // This one will create the magic
@@ -51,6 +54,18 @@ class QRScannerOverlay extends StatelessWidget {
         ),
       ),
     ]);
+  }
+
+  Widget showWaitingScreen() {
+    if (isLoaded == true) {
+      return const Center(
+        child: LoaderScreen(
+          isFullScreen: false,
+        ),
+      );
+    } else {
+      return Container();
+    }
   }
 }
 

@@ -141,6 +141,25 @@ class Database {
     }
   }
 
+  Future<GymDetailsModel?> isGymPresent(String uid) async {
+    try {
+      final  QuerySnapshot<Map<String, dynamic>> doc = (
+          await _firestore
+          .collection('gym')
+          .where('id', isEqualTo: uid)
+          .get());
+
+      if (doc.docs.isNotEmpty) {
+        final GymDetailsModel gymDetailsModel = GymDetailsModel.fromJson(doc.docs.first.data());
+        return gymDetailsModel;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
   Future<String?> updateGymReportData(
       String ownerId, String formattedTime, BuildContext context) async {
     try {

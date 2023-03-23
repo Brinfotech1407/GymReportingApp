@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/auth/login_screen.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
+import 'package:gim_app/models/gym_details.dart';
 import 'package:gim_app/models/gym_report_model.dart';
 import 'package:gim_app/qr_scanner_overlay.dart';
 import 'package:gim_app/services/database.dart';
-import 'package:gim_app/thank_you.dart';
 import 'package:gim_app/waiting/LoaderScreen.dart';
+
+// ignore: depend_on_referenced_packages
+import "package:intl/intl.dart";
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:uuid/uuid.dart';
-
-// ignore: depend_on_referenced_packages
-import "package:intl/intl.dart";
 
 class HomeScreen extends StatefulWidget {
   final String currentUserID;
@@ -90,13 +90,38 @@ class _HomeScreenState extends State<HomeScreen>
                         DateFormat('yyyy-MM-dd').format(now).obs;
                     RxString formattedTime =
                         DateFormat('HH:mm:ss').format(now).obs;
+
                     scannerId.value = barcode.barcodes.first.rawValue!;
+
                     print(scannerId.value);
 
                     if (scannerId.isNotEmpty) {
                       cameraController.stop();
                       isLoaded.value = true;
-                      GymReportModel? gymData;
+
+                      GymDetailsModel? gymDetails =
+                          await Database().isGymPresent(scannerId.value);
+                      if (gymDetails != null) {
+                        QuickAlert.show(
+                          context: context,
+                          type: QuickAlertType.error,
+                          title: '',
+                          text: "Gym Found",
+                        );
+                      } else {
+                        QuickAlert.show(
+                          context: context,
+                          type: QuickAlertType.error,
+                          title: '',
+                          text:
+                              "Sorry, Gym not found please try another QRCode",
+                        );
+                      }
+                      isLoaded.value = false;
+                      cameraController.start();
+                    }
+
+                    /*GymReportModel? gymData;
 
                       gymData = await Database()
                           .getSingleGymReportData(widget.currentUserID);
@@ -117,14 +142,12 @@ class _HomeScreenState extends State<HomeScreen>
                           gymData.date == formattedDate.value &&
                           gymData.isUserSignedOutForDay == false &&
                           gymData.gymId == scannerId.value) {
-
                         // ignore: use_build_context_synchronously
                         await Database().updateGymReportData(
                             widget.currentUserID, formattedTime.value, context);
 
                         Get.to(const ThankYouScreen());
                       } else {
-
                         // ignore: use_build_context_synchronously
                         await createGymReport(barcode, formattedDate.value,
                             formattedTime.value, context);
@@ -133,10 +156,11 @@ class _HomeScreenState extends State<HomeScreen>
                       }
                       isLoaded.value = false;
                     }
-                    cameraController.start();
+                    cameraController.start();*/
                   },
                 ),
-                 QRScannerOverlay(overlayColour: Colors.white,isLoaded: isLoaded.value),
+                QRScannerOverlay(
+                    overlayColour: Colors.white, isLoaded: isLoaded.value),
               ],
             ),
           ),

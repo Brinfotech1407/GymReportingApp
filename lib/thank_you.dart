@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:gim_app/utils/gym_utils.dart';
 
@@ -12,6 +14,7 @@ class _ThankYouScreenState extends State<ThankYouScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _opacityAnimation;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -19,7 +22,7 @@ class _ThankYouScreenState extends State<ThankYouScreen>
 
     // Initialize animation controller
     _controller = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 3),
       vsync: this,
     );
 
@@ -33,11 +36,19 @@ class _ThankYouScreenState extends State<ThankYouScreen>
 
     // Start the animation
     _controller.forward();
+
+    // Start the timer when the screen is created
+    _timer = Timer(const Duration(seconds: 5), () {
+      Navigator.of(context).pop();
+    });
+
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    // Cancel the timer when the screen is disposed
+    _timer!.cancel();
     super.dispose();
   }
 

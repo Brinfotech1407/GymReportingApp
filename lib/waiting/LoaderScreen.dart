@@ -10,9 +10,6 @@ class LoaderScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return isFullScreen
         ? const SplashScreen()
-        : Container(
-            alignment: AlignmentDirectional.center,
-            child: const CircularProgressIndicator(),
-          );
+        : Center(child: CircularProgressIndicator());
   }
 }

@@ -11,6 +11,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:uuid/uuid.dart';
+
 // ignore: depend_on_referenced_packages
 import "package:intl/intl.dart";
 
@@ -25,12 +26,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
-  String? scannerId;
+  RxString scannerId = ''.obs;
   MobileScannerController cameraController = MobileScannerController();
   MobileScannerArguments? arguments;
 
-  bool isStarted = true;
+  RxBool isStarted = true.obs;
   RxBool isLoaded = false.obs;
+  DateTime now = DateTime.now();
 
   @override
   void dispose() {
@@ -40,23 +42,18 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void initState() {
-    setState(() {
-      if (isStarted) {
-        cameraController.stop();
-      } else {
-        cameraController.start();
-      }
-      isStarted = !isStarted;
-    });
+    if (isStarted.isTrue) {
+      cameraController.stop();
+    } else {
+      cameraController.start();
+    }
+    isStarted.value = !isStarted.value;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     double scanArea = buildScanArea(context);
-    DateTime now = DateTime.now();
-    String formattedDate = DateFormat('yyyy-MM-dd').format(now);
-    String formattedTime = DateFormat('HH:mm:ss').format(now);
     return Scaffold(
         body: SafeArea(
             child: Column(
@@ -85,38 +82,60 @@ class _HomeScreenState extends State<HomeScreen>
             child: Stack(
               alignment: Alignment.center,
               children: [
+                showWaitingScreen(),
                 MobileScanner(
-                    controller: cameraController,
-                    onDetect: (barcodes)  async {
-                      scannerId = barcodes.barcodes.first.rawValue;
-                      if (scannerId != null && scannerId!.isNotEmpty) {
-                        cameraController.stop();
-                        isLoaded.toggle();
-                        showWaitingScreen();
+                  controller: cameraController,
+                  fit: BoxFit.contain,
+                  onDetect: (barcode) async {
+                    RxString formattedDate =
+                        DateFormat('yyyy-MM-dd').format(now).obs;
+                    RxString formattedTime =
+                        DateFormat('HH:mm:ss').format(now).obs;
+                    scannerId.value = barcode.barcodes.first.rawValue!;
+                    print(scannerId.value);
 
-                     GymReportModel? gymData = await Database().getSingleGymReportData(widget.currentUserID);
+                    if (scannerId.isNotEmpty) {
+                      cameraController.stop();
 
-                        if (gymData != null && gymData.userId.isNotEmpty  &&
-                            gymData.date == formattedDate) {
-                          // ignore: use_build_context_synchronously
-                          await Database().updateGymReportData(
-                              widget.currentUserID, formattedTime, context);
+                      GymReportModel? gymData;
 
-                          Future.delayed(const Duration( seconds: 5), () {
-                            Get.to(const ThankYouScreen());
-                          });
-                        } else {
-                          // ignore: use_build_context_synchronously
-                          await createGymReport(
-                              barcodes, formattedDate, formattedTime, context);
-                        }
+                      gymData = await Database()
+                          .getSingleGymReportData(widget.currentUserID);
 
+                      if (gymData != null &&
+                          gymData.gymId == scannerId.value &&
+                          gymData.isUserSignedOutForDay == true) {
+                        QuickAlert.show(
+                          context: context,
+                          type: QuickAlertType.error,
+                          title: '',
+                          text:
+                              "Sorry, you have already signed in and out of the gym today. You cannot enter the gym again.",
+                        );
+                      } else if (gymData != null &&
+                          widget.currentUserID == gymData.userId &&
+                          gymData.signInTime != formattedTime.value &&
+                          gymData.date == formattedDate.value &&
+                          gymData.isUserSignedOutForDay == false &&
+                          gymData.gymId == scannerId.value) {
+                        isLoaded.value = true;
+                        // ignore: use_build_context_synchronously
+                        await Database().updateGymReportData(
+                            widget.currentUserID, formattedTime.value, context);
                         isLoaded.value = false;
+                        Get.to(const ThankYouScreen());
                       } else {
-                        cameraController.start();
+                        isLoaded.value = true;
+                        // ignore: use_build_context_synchronously
+                        await createGymReport(barcode, formattedDate.value,
+                            formattedTime.value, context);
+                        isLoaded.value = false;
+                        Get.to(const ThankYouScreen());
                       }
-                      debugPrint('Barcode found! $scannerId');
-                    }),
+                    }
+                    cameraController.start();
+                  },
+                ),
                 const QRScannerOverlay(overlayColour: Colors.white),
               ],
             ),
@@ -148,11 +167,15 @@ class _HomeScreenState extends State<HomeScreen>
         });
   }
 
-  void showWaitingScreen() {
+  Widget showWaitingScreen() {
     if (isLoaded.value == true) {
-      Get.to(const LoaderScreen(
-        isFullScreen: true,
-      ));
+      return const Center(
+        child: LoaderScreen(
+          isFullScreen: false,
+        ),
+      );
+    } else {
+      return Container();
     }
   }
 

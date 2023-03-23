@@ -17,9 +17,9 @@ class MyCollectionController extends GetxController {
     documents.value = snapshot.docs;
   }
 
-  void updateData(DocumentSnapshot doc, Map<String, dynamic> newData) async {
+  /*void updateData(DocumentSnapshot doc, Map<String, dynamic> newData) async {
     await doc.reference.update(newData);
     int index = documents.indexWhere((d) => d.id == doc.id);
     documents[index] = await doc.reference.get();
-  }
+  }*/
 }

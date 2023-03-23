@@ -140,12 +140,36 @@ class GymUtils {
     required String title,
     required String desc,
     required String confirmText,
+    required  QuickAlertType showAlertdialogType,
   }) {
-    QuickAlert.show(
-        context: context,
-        type: QuickAlertType.error,
-        title: title,
-        confirmBtnText: confirmText,
-        text: desc);
+    if(showAlertdialogType == QuickAlertType.warning){
+      QuickAlert.show(
+          context: context,
+          type: QuickAlertType.warning,
+          title: title,
+          confirmBtnText: confirmText,
+          text: desc);
+    }else if(showAlertdialogType ==QuickAlertType.info){
+      QuickAlert.show(
+          context: context,
+          type: QuickAlertType.info,
+          title: title,
+          confirmBtnText: confirmText,
+          text: desc);
+    }else if(showAlertdialogType == QuickAlertType.loading){
+      QuickAlert.show(
+          context: context,
+          type: QuickAlertType.loading,
+          title: title,
+          confirmBtnText: confirmText,
+          text: desc);
+    }else if(showAlertdialogType == QuickAlertType.error){
+      QuickAlert.show(
+          context: context,
+          type: QuickAlertType.error,
+          title: title,
+          confirmBtnText: confirmText,
+          text: desc);
+    }
   }
 }

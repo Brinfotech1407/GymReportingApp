@@ -139,22 +139,34 @@ class _HomeScreenState extends State<HomeScreen>
           );
           Get.to(const ThankYouScreen());
         } else if (userStatus == 2) {
-          //Todo User Already signed in and signed out for
           GymUtils().showAlertDialog(
             context: context,
             title: '',
-            desc: 'User Already Signed In and Signed Out For Today, thanks',
+            desc: 'Sorry, it appears that you have already signed in and out.thanks',
             confirmText: 'Okay',
+            showAlertdialogType: QuickAlertType.warning
           );
         }
       } else {
-        //Todo GYM not found message needs to show Gym Not Found
+        GymUtils().showAlertDialog(
+            context: context,
+            title: '',
+            desc:  "We're sorry, but the gym you are looking for could not be found.",
+            confirmText: 'Okay',
+            showAlertdialogType: QuickAlertType.warning
+        );
       }
       isLoaded.value = false;
-      //Todo Needs to add 3 second Delay and then start camera
+      Future.delayed(const Duration(seconds: 3));
       cameraController.start();
     } else {
-      //Todo GYM not found message needs to show invalid QRCod
+      GymUtils().showAlertDialog(
+          context: context,
+          title: '',
+          desc:  "gym you are looking for could not be found.invalid QR code",
+          confirmText: 'Okay',
+          showAlertdialogType: QuickAlertType.warning
+      );
     }
   }
 

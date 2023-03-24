@@ -163,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen>
       GymUtils().showAlertDialog(
           context: context,
           title: '',
-          desc:  "gym you are looking for could not be found.invalid QR code",
+          desc: "gym you are looking for could not be found.invalid QR code",
           confirmText: 'Okay',
           showAlertdialogType: QuickAlertType.warning
       );

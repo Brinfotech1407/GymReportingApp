@@ -122,6 +122,12 @@ class Database {
     return gymReportData.id;
   }
 
+  Stream<List<GymReportModel>> fetchGymReport() {
+    return  _firestore.collection('gym_report').snapshots().map((event) {
+        return event.docs.map((e) =>  GymReportModel.fromJson(e.data())).toList();
+      });
+  }
+
   Future<GymReportModel?> getSingleGymReportData(String uid) async {
     try {
       final QuerySnapshot<Map<String, dynamic>> doc = (await _firestore

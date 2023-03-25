@@ -140,30 +140,30 @@ class GymUtils {
     required String title,
     required String desc,
     required String confirmText,
-    required  QuickAlertType showAlertdialogType,
+    required QuickAlertType showAlertdialogType,
   }) {
-    if(showAlertdialogType == QuickAlertType.warning){
+    if (showAlertdialogType == QuickAlertType.warning) {
       QuickAlert.show(
           context: context,
           type: QuickAlertType.warning,
           title: title,
           confirmBtnText: confirmText,
           text: desc);
-    }else if(showAlertdialogType ==QuickAlertType.info){
+    } else if (showAlertdialogType == QuickAlertType.info) {
       QuickAlert.show(
           context: context,
           type: QuickAlertType.info,
           title: title,
           confirmBtnText: confirmText,
           text: desc);
-    }else if(showAlertdialogType == QuickAlertType.loading){
+    } else if (showAlertdialogType == QuickAlertType.loading) {
       QuickAlert.show(
           context: context,
           type: QuickAlertType.loading,
           title: title,
           confirmBtnText: confirmText,
           text: desc);
-    }else if(showAlertdialogType == QuickAlertType.error){
+    } else if (showAlertdialogType == QuickAlertType.error) {
       QuickAlert.show(
           context: context,
           type: QuickAlertType.error,
@@ -171,5 +171,26 @@ class GymUtils {
           confirmBtnText: confirmText,
           text: desc);
     }
+  }
+
+  pickDateDialog(BuildContext context) {
+    Rx<DateTime> selectedDate=  DateTime.now().obs;
+    showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            //which date will display when user open the picker
+            firstDate: DateTime(2000),
+            //what will be the previous supported year in picker
+            lastDate: DateTime
+                .now()) //what will be the up to supported date in picker
+        .then((pickedDate) {
+      //then usually do the future job
+      if (pickedDate == null) {
+        //if user tap cancel then this function will stop
+        return;
+      }
+      //for rebuilding the ui
+      selectedDate.value = pickedDate;
+    });
   }
 }

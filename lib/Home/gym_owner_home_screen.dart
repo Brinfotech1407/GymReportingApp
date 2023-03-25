@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/get_navigation.dart';
@@ -5,7 +6,6 @@ import 'package:get/get_rx/get_rx.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:gim_app/auth/login_screen.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
-import 'package:gim_app/models/gym_report_model.dart';
 import 'package:gim_app/services/database.dart';
 import 'package:gim_app/utils/gym_utils.dart';
 import 'package:quickalert/quickalert.dart';
@@ -28,9 +28,22 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StreamBuilder<List<GymReportModel>>(
+      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: Database().fetchGymReport(),
         builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          }
+
+          if (!snapshot.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          List<Map<String, dynamic>> data = snapshot.data!.docs.map((document) => document.data()).toList();
           return SafeArea(
             child: Container(
               decoration: GymUtils().buildBoxDecoration(),
@@ -48,7 +61,7 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                                   showFilterIcon.value = false;
                                 },
                                 icon: const Icon(
-                                  Icons.filter_list_alt,
+                                  Icons.filter_list,
                                   color: Colors.white,
                                 )),
                           ),
@@ -83,89 +96,102 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                       ],
                     ),
                   ),
-                  if (snapshot.hasData) ...[
-                    if (snapshot.data!.isEmpty) ...[
-                      const Center(
-                        child: Text('no data found'),
-                      )
-                    ] else ...[
                       Expanded(
                         child: ListView.builder(
                           scrollDirection: Axis.vertical,
-                          itemCount: snapshot.data!.length,
+                          itemCount: data.length,
                           itemBuilder: (BuildContext context, int index) {
-                            GymReportModel doc = snapshot.data![index];
-                            return SizedBox(
-                              height: 170,
-                              child: Card(
-                                color: Colors.transparent,
-                                margin: const EdgeInsets.all(12),
-                                elevation: 0.5,
-                                shadowColor: Colors.blue,
-                                shape: const RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(12)),
-                                    side: BorderSide(
-                                      color: Colors.white,
-                                    )),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(14),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          buildText(content: 'name: '),
-                                          buildText(
-                                              content:
-                                                  '${doc.isUserSignedOutForDay}',
-                                              isContentStyleView: true),
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          buildText(content: 'Date: '),
-                                          buildText(
-                                              content: doc.date,
-                                              isContentStyleView: true),
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 20),
-                                            child: Column(
+                            Map<String, dynamic> documentData = data[index];
+                            String userId = documentData['userId'];
+                            return StreamBuilder(
+                              stream: Database().getData(userId),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Center(
+                                      child: Text('Error: ${snapshot.error}'),
+                                    );
+                                  }
+
+                                  if (!snapshot.hasData) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+
+                                  List<Map<String, dynamic>> userData = snapshot.data!.docs.map((document) => document.data()).toList();
+                                  // Process the User data as needed
+                                  Object name = index < userData.length ? userData[index]['firstName'] : '';
+                                  return  SizedBox(
+                                    height: 170,
+                                    child: Card(
+                                      color: Colors.transparent,
+                                      margin: const EdgeInsets.all(12),
+                                      elevation: 0.5,
+                                      shadowColor: Colors.blue,
+                                      shape: const RoundedRectangleBorder(
+                                          borderRadius:
+                                          BorderRadius.all(Radius.circular(12)),
+                                          side: BorderSide(
+                                            color: Colors.white,
+                                          )),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(14),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
                                               children: [
-                                                buildText(content: 'SignedIn '),
+                                                buildText(content: 'name: '),
                                                 buildText(
-                                                    content: doc.signInTime,
+                                                    content:
+                                                    '${name}',
                                                     isContentStyleView: true),
                                               ],
                                             ),
-                                          ),
-                                          Column(
-                                            children: [
-                                              buildText(content: 'SignedOut '),
-                                              buildText(
-                                                  content: doc.signOutTime,
-                                                  isContentStyleView: true),
-                                            ],
-                                          )
-                                        ],
+                                            Row(
+                                              children: [
+                                                buildText(content: 'Date: '),
+                                                buildText(
+                                                    content:documentData['date'],
+                                                    isContentStyleView: true),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.only(
+                                                      right: 20),
+                                                  child: Column(
+                                                    children: [
+                                                      buildText(content: 'SignedIn '),
+                                                      buildText(
+                                                          content: documentData['signInTime'],
+                                                          isContentStyleView: true),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Column(
+                                                  children: [
+                                                    buildText(content: 'SignedOut '),
+                                                    buildText(
+                                                        content: documentData['signOutTime'],
+                                                        isContentStyleView: true),
+                                                  ],
+                                                )
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
+                                    ),
+                                  );
+                                  },);
                           },
                         ),
                       ),
-                    ]
-                  ],
+
                 ],
               ),
             ),

@@ -5,13 +5,14 @@ import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
-import 'package:gim_app/utils/gym_utils.dart';
 import 'package:gim_app/models/gym_details.dart';
 import 'package:gim_app/services/database.dart';
+import 'package:gim_app/utils/gym_utils.dart';
 import 'package:gim_app/waiting/LoaderScreen.dart';
 import 'package:uuid/uuid.dart';
 
 import 'Home/gym_owner_home_screen.dart';
+import 'services/preference_service.dart';
 
 class GymDetailsScreen extends StatefulWidget {
   final String ownerID;
@@ -28,6 +29,7 @@ class _GymDetailsScreenState extends State<GymDetailsScreen> {
   final TextEditingController _gymContactNoController = TextEditingController();
   final capacityController = Get.put(CapacityController());
   RxBool isLoaded = false.obs;
+  PreferenceService preferenceService = PreferenceService();
 
   @override
   Widget build(BuildContext context) {
@@ -136,31 +138,32 @@ class _GymDetailsScreenState extends State<GymDetailsScreen> {
   }
 
   Future<void> setGymDetails(BuildContext context) async {
-     final GymDetailsModel gymDetails = GymDetailsModel(
-      id: gymUserID(),
+    String uniqueGymID = getUniqueueID();
+    preferenceService.setString(PreferenceService.gymID, uniqueGymID);
+    final GymDetailsModel gymDetails = GymDetailsModel(
+      id: uniqueGymID,
       name: _gymNameController.text,
       address: _gymAddressController.text,
       capacity: capacityController.capacity.value,
       contactNo: _gymContactNoController.text,
       ownerId: widget.ownerID,
     );
-    await Database()
-        .createGymDetails(gymDetails, context);
+    await Database().createGymDetails(gymDetails, context);
   }
 
   bool isDataNotEmpty() {
     return _gymContactNoController.text.isNotEmpty &&
-                  _gymAddressController.text.isNotEmpty &&
-                  _gymNameController.text.isNotEmpty;
+        _gymAddressController.text.isNotEmpty &&
+        _gymNameController.text.isNotEmpty;
   }
 
   void clearGymControllervalue() {
-     _gymNameController.clear();
+    _gymNameController.clear();
     _gymAddressController.clear();
     _gymContactNoController.clear();
   }
 
-  String gymUserID() {
+  String getUniqueueID() {
     return const Uuid().v4();
   }
 }

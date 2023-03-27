@@ -9,6 +9,7 @@ class PreferenceService {
   static const String userLoggedIN = 'USER_LOGGED_IN';
   static const String ownerGymDetailsFiled = 'GYM_DETAILS_SUBMIT';
   static const String userID = 'USER_ID';
+  static const String gymID="GYM_ID";
 
   PreferenceService() {
     init();

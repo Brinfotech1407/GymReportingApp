@@ -123,12 +123,18 @@ class Database {
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getData(String uid) {
-    return _firestore.collection('users').where('id', isEqualTo:uid).snapshots();
+    return _firestore
+        .collection('users')
+        .where('id', isEqualTo: uid)
+        .snapshots();
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> fetchGymReport() {
-
-  return  FirebaseFirestore.instance.collection('gym_report').snapshots();
+    String? gymId = _preferenceService.getString(PreferenceService.gymID);
+    return FirebaseFirestore.instance
+        .collection('gym_report')
+        .where("gymId", isEqualTo: gymId)
+        .snapshots();
   }
 
   Future<GymReportModel?> getSingleGymReportData(String uid) async {
@@ -142,6 +148,25 @@ class Database {
         final GymReportModel user =
             GymReportModel.fromJson(doc.docs.first.data());
         return user;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<GymDetailsModel?> getGymDetails(String uid) async {
+    try {
+      final QuerySnapshot<Map<String, dynamic>> doc = (await _firestore
+          .collection('gym')
+          .where('ownerId', isEqualTo: uid)
+          .get());
+
+      if (doc.docs.isNotEmpty) {
+        final GymDetailsModel gymDetailsModel =
+            GymDetailsModel.fromJson(doc.docs.first.data());
+        return gymDetailsModel;
       } else {
         return null;
       }

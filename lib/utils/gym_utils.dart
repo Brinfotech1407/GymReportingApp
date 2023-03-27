@@ -4,10 +4,15 @@ import 'package:gim_app/Home/gym_owner_home_screen.dart';
 import 'package:gim_app/Home/home_screen.dart';
 import 'package:gim_app/auth/login_screen.dart';
 import 'package:gim_app/gym_details_screen.dart';
+import 'package:gim_app/models/gym_details.dart';
+import 'package:gim_app/services/database.dart';
+import 'package:gim_app/services/preference_service.dart';
 import 'package:gim_app/utils/app_constant.dart';
 import 'package:quickalert/quickalert.dart';
 
 class GymUtils {
+  final PreferenceService _preferenceService = PreferenceService();
+
   BoxDecoration buildBoxDecoration() {
     return BoxDecoration(
       gradient: LinearGradient(
@@ -120,9 +125,11 @@ class GymUtils {
     }
   }
 
-  void showOwnerScreens(
-      {required bool ownerGymDetailsFiled, required String ownerID}) {
+  Future<void> showOwnerScreens(
+      {required bool ownerGymDetailsFiled, required String ownerID}) async {
     if (ownerGymDetailsFiled) {
+      GymDetailsModel? gymDetails = await Database().getGymDetails(ownerID);
+      _preferenceService.setString(PreferenceService.gymID, gymDetails?.id);
       Get.to(() => const GymOwnerHomeScreen());
     } else {
       Get.to(() => GymDetailsScreen(
@@ -174,7 +181,7 @@ class GymUtils {
   }
 
   pickDateDialog(BuildContext context) {
-    Rx<DateTime> selectedDate=  DateTime.now().obs;
+    Rx<DateTime> selectedDate = DateTime.now().obs;
     showDatePicker(
             context: context,
             initialDate: DateTime.now(),

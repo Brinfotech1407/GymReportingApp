@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -9,10 +7,11 @@ import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:gim_app/auth/login_screen.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
 import 'package:gim_app/models/gym_report_model.dart';
-import 'package:gim_app/models/user.dart';
 import 'package:gim_app/services/database.dart';
+import 'package:gim_app/utils/date_time_utils.dart';
 import 'package:gim_app/utils/gym_utils.dart';
 import 'package:quickalert/quickalert.dart';
+import 'package:intl/intl.dart';
 
 class GymOwnerHomeScreen extends StatefulWidget {
   const GymOwnerHomeScreen({Key? key}) : super(key: key);
@@ -23,19 +22,21 @@ class GymOwnerHomeScreen extends StatefulWidget {
 
 class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
   RxBool showFilterIcon = true.obs;
-  SplayTreeMap<String?, UserModel>? arrMemberList =
-  SplayTreeMap<String, UserModel>();
+  RxBool isDateFilterView = false.obs;
+  List<GymReportModel> arrDateFilterList = [];
+  Rx<String> selectedDate = DateTimeUtils().getCurrentDate().obs;
 
   @override
   void initState() {
     super.initState();
+    selectedDate;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: Database().fetchGymReport(),
+        stream: Database().fetchGymReport(selectedDate.value),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
@@ -51,7 +52,7 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
 
           final List<GymReportModel> arrGymReports = snapshot.data!.docs
               .map((QueryDocumentSnapshot<Map<String, dynamic>> e) =>
-              GymReportModel.fromJson(e.data()))
+                  GymReportModel.fromJson(e.data()))
               .toList();
 
           return SafeArea(
@@ -60,53 +61,53 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
               child: Column(
                 children: [
                   Obx(
-                        () =>
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            if (showFilterIcon.isTrue) ...[
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 18),
-                                child: IconButton(
-                                    onPressed: () async {
-                                      showFilterIcon.value = false;
-                                    },
-                                    icon: const Icon(
-                                      Icons.filter_list,
-                                      color: Colors.white,
-                                    )),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 18),
-                                child: IconButton(
-                                    onPressed: () async {
-                                      QuickAlert.show(
-                                        context: context,
-                                        type: QuickAlertType.confirm,
-                                        title: '',
-                                        cancelBtnText: 'No',
-                                        confirmBtnText: 'yes',
-                                        text:
+                    () => Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        if (showFilterIcon.isTrue) ...[
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 18),
+                            child: IconButton(
+                                onPressed: () async {
+                                  showFilterIcon.value = false;
+                                },
+                                icon: const Icon(
+                                  Icons.filter_list,
+                                  color: Colors.white,
+                                )),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 18),
+                            child: IconButton(
+                                onPressed: () async {
+                                  QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.confirm,
+                                    title: '',
+                                    cancelBtnText: 'No',
+                                    confirmBtnText: 'yes',
+                                    text:
                                         "Are you sure you want to log out? Your session will be terminated and you will need to log in again to use the app.",
-                                        onConfirmBtnTap: () {
-                                          AuthController.instance.logout();
-                                          Get.to(() => const LoginScreen());
-                                        },
-                                      );
+                                    onConfirmBtnTap: () {
+                                      AuthController.instance.logout();
+                                      Get.to(() => const LoginScreen());
                                     },
-                                    icon: const Icon(
-                                      Icons.logout,
-                                      color: Colors.white,
-                                    )),
-                              ),
-                            ] else
-                              ...[
-                                Align(
-                                    alignment: Alignment.centerRight,
-                                    child: filterView(context)),
-                              ],
-                          ],
-                        ),
+                                  );
+                                },
+                                icon: const Icon(
+                                  Icons.logout,
+                                  color: Colors.white,
+                                )),
+                          ),
+                        ] else ...[
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: filterView(
+                                context: context, gymReportData: arrGymReports),
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
                   Expanded(
                     child: ListView.builder(
@@ -123,7 +124,7 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                             shadowColor: Colors.blue,
                             shape: const RoundedRectangleBorder(
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(12)),
+                                    BorderRadius.all(Radius.circular(12)),
                                 side: BorderSide(
                                   color: Colors.white,
                                 )),
@@ -153,13 +154,13 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                                     children: [
                                       Padding(
                                         padding:
-                                        const EdgeInsets.only(right: 20),
+                                            const EdgeInsets.only(right: 20),
                                         child: Column(
                                           children: [
                                             buildText(content: 'SignedIn '),
                                             buildText(
                                                 content:
-                                                gymReportItem.signInTime,
+                                                    gymReportItem.signInTime,
                                                 isContentStyleView: true),
                                           ],
                                         ),
@@ -200,12 +201,14 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
         style: isContentStyleView
             ? const TextStyle(color: Colors.white)
             : const TextStyle(
-            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
       ),
     );
   }
 
-  Widget filterView(BuildContext context) {
+  Widget filterView(
+      {required BuildContext context,
+      required List<GymReportModel> gymReportData}) {
     return Column(
       children: [
         Row(
@@ -213,17 +216,21 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
           children: [
             GestureDetector(
               onTap: () {},
-              child: filterButtonView('name'),
+              child: filterButtonView('name', false),
             ),
             GestureDetector(
               onTap: () {
-                GymUtils().pickDateDialog(context);
+                _selectDate(context);
               },
-              child: filterButtonView('date'),
+              child: filterButtonView('date', isDateFilterView.isTrue),
             ),
             IconButton(
                 onPressed: () async {
-                  showFilterIcon.value = true;
+                  setState(() {
+                    showFilterIcon.value = true;
+                    isDateFilterView.value = false;
+                    selectedDate = DateTimeUtils().getCurrentDate().obs;
+                  });
                 },
                 icon: const Icon(
                   Icons.close,
@@ -235,10 +242,26 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
     );
   }
 
-  Container filterButtonView(String buttonName) {
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(1900),
+        lastDate: DateTime(2100)); // Display the date picker dialog
+
+    if (picked != null) {
+      String dateString = DateFormat('yyyy-MM-dd').format(picked);
+      setState(() {
+        selectedDate.value = dateString;
+        isDateFilterView.value = true;
+      });
+    }
+  }
+
+  Container filterButtonView(String buttonName, bool isSelectFilter) {
     return Container(
       decoration: BoxDecoration(
-        color: /* selected ?*/ Colors.blue /*: Colors.white*/,
+        color: isSelectFilter ? Colors.purple.shade900 : Colors.blue,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white),
       ),

@@ -66,8 +66,7 @@ class Database {
           .get());
 
       if (doc.docs.isNotEmpty) {
-        final UserModel userModel =
-        UserModel.fromJson(doc.docs.first.data());
+        final UserModel userModel = UserModel.fromJson(doc.docs.first.data());
         return userModel;
       } else {
         return null;
@@ -123,17 +122,11 @@ class Database {
     return gymReportData.id;
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getData(String uid) {
-    return _firestore
-        .collection('users')
-        .where('id', isEqualTo: uid)
-        .snapshots();
-  }
-
-  Stream<QuerySnapshot<Map<String, dynamic>>> fetchGymReport() {
+  Stream<QuerySnapshot<Map<String, dynamic>>> fetchGymReport(String date) {
     String? gymId = _preferenceService.getString(PreferenceService.gymID);
     return FirebaseFirestore.instance
         .collection('gym_report')
+        .where("date", isEqualTo: date)
         .where("gymId", isEqualTo: gymId)
         .snapshots();
   }

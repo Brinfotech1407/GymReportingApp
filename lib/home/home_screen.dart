@@ -4,6 +4,7 @@ import 'package:gim_app/auth/login_screen.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
 import 'package:gim_app/models/gym_details.dart';
 import 'package:gim_app/models/gym_report_model.dart';
+import 'package:gim_app/models/user.dart';
 import 'package:gim_app/qr_scanner_overlay.dart';
 import 'package:gim_app/services/database.dart';
 import 'package:gim_app/utils/date_time_utils.dart';
@@ -130,9 +131,11 @@ class _HomeScreenState extends State<HomeScreen>
           );
           Get.to(const ThankYouScreen());
         } else if (userStatus == 0) {
+          UserModel? user = await Database().getUser(widget.currentUserID);
           //insert
           await createGymReport(
             gymID: scanID,
+            userName: '${user?.firstName} ${user?.lastName}',
             context: context,
             formattedDate: currentDate,
             formattedTime: time,
@@ -140,21 +143,21 @@ class _HomeScreenState extends State<HomeScreen>
           Get.to(const ThankYouScreen());
         } else if (userStatus == 2) {
           GymUtils().showAlertDialog(
-            context: context,
-            title: '',
-            desc: 'Sorry, it appears that you have already signed in and out.thanks',
-            confirmText: 'Okay',
-            showAlertdialogType: QuickAlertType.warning
-          );
+              context: context,
+              title: '',
+              desc:
+                  'Sorry, it appears that you have already signed in and out.thanks',
+              confirmText: 'Okay',
+              showAlertdialogType: QuickAlertType.warning);
         }
       } else {
         GymUtils().showAlertDialog(
             context: context,
             title: '',
-            desc:  "We're sorry, but the gym you are looking for could not be found.",
+            desc:
+                "We're sorry, but the gym you are looking for could not be found.",
             confirmText: 'Okay',
-            showAlertdialogType: QuickAlertType.warning
-        );
+            showAlertdialogType: QuickAlertType.warning);
       }
       isLoaded.value = false;
       Future.delayed(const Duration(seconds: 3));
@@ -165,8 +168,7 @@ class _HomeScreenState extends State<HomeScreen>
           title: '',
           desc: "gym you are looking for could not be found.invalid QR code",
           confirmText: 'Okay',
-          showAlertdialogType: QuickAlertType.warning
-      );
+          showAlertdialogType: QuickAlertType.warning);
     }
   }
 
@@ -205,6 +207,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Future<void> createGymReport({
     required String gymID,
+    required String userName,
     required String formattedDate,
     required String formattedTime,
     required BuildContext context,
@@ -212,6 +215,7 @@ class _HomeScreenState extends State<HomeScreen>
     GymReportModel gymReport = GymReportModel(
       id: gymUserID(),
       gymId: gymID,
+      userName: userName,
       userId: widget.currentUserID,
       date: formattedDate,
       signInTime: formattedTime,

@@ -24,12 +24,11 @@ class GymOwnerHomeScreen extends StatefulWidget {
 class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
   RxBool showFilterIcon = true.obs;
   SplayTreeMap<String?, UserModel>? arrMemberList =
-      SplayTreeMap<String, UserModel>();
+  SplayTreeMap<String, UserModel>();
 
   @override
   void initState() {
     super.initState();
-    //Todo Fetch User list
   }
 
   @override
@@ -52,7 +51,7 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
 
           final List<GymReportModel> arrGymReports = snapshot.data!.docs
               .map((QueryDocumentSnapshot<Map<String, dynamic>> e) =>
-                  GymReportModel.fromJson(e.data()))
+              GymReportModel.fromJson(e.data()))
               .toList();
 
           return SafeArea(
@@ -61,51 +60,53 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
               child: Column(
                 children: [
                   Obx(
-                    () => Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        if (showFilterIcon.isTrue) ...[
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 18),
-                            child: IconButton(
-                                onPressed: () async {
-                                  showFilterIcon.value = false;
-                                },
-                                icon: const Icon(
-                                  Icons.filter_list,
-                                  color: Colors.white,
-                                )),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 18),
-                            child: IconButton(
-                                onPressed: () async {
-                                  QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.confirm,
-                                    title: '',
-                                    cancelBtnText: 'No',
-                                    confirmBtnText: 'yes',
-                                    text:
-                                        "Are you sure you want to log out? Your session will be terminated and you will need to log in again to use the app.",
-                                    onConfirmBtnTap: () {
-                                      AuthController.instance.logout();
-                                      Get.to(() => const LoginScreen());
+                        () =>
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            if (showFilterIcon.isTrue) ...[
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 18),
+                                child: IconButton(
+                                    onPressed: () async {
+                                      showFilterIcon.value = false;
                                     },
-                                  );
-                                },
-                                icon: const Icon(
-                                  Icons.logout,
-                                  color: Colors.white,
-                                )),
-                          ),
-                        ] else ...[
-                          Align(
-                              alignment: Alignment.centerRight,
-                              child: filterView(context)),
-                        ],
-                      ],
-                    ),
+                                    icon: const Icon(
+                                      Icons.filter_list,
+                                      color: Colors.white,
+                                    )),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 18),
+                                child: IconButton(
+                                    onPressed: () async {
+                                      QuickAlert.show(
+                                        context: context,
+                                        type: QuickAlertType.confirm,
+                                        title: '',
+                                        cancelBtnText: 'No',
+                                        confirmBtnText: 'yes',
+                                        text:
+                                        "Are you sure you want to log out? Your session will be terminated and you will need to log in again to use the app.",
+                                        onConfirmBtnTap: () {
+                                          AuthController.instance.logout();
+                                          Get.to(() => const LoginScreen());
+                                        },
+                                      );
+                                    },
+                                    icon: const Icon(
+                                      Icons.logout,
+                                      color: Colors.white,
+                                    )),
+                              ),
+                            ] else
+                              ...[
+                                Align(
+                                    alignment: Alignment.centerRight,
+                                    child: filterView(context)),
+                              ],
+                          ],
+                        ),
                   ),
                   Expanded(
                     child: ListView.builder(
@@ -122,7 +123,7 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                             shadowColor: Colors.blue,
                             shape: const RoundedRectangleBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(12)),
+                                BorderRadius.all(Radius.circular(12)),
                                 side: BorderSide(
                                   color: Colors.white,
                                 )),
@@ -136,7 +137,7 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                                     children: [
                                       buildText(content: 'name: '),
                                       buildText(
-                                          content: gymReportItem.userId,
+                                          content: gymReportItem.userName,
                                           isContentStyleView: true),
                                     ],
                                   ),
@@ -152,13 +153,13 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                                     children: [
                                       Padding(
                                         padding:
-                                            const EdgeInsets.only(right: 20),
+                                        const EdgeInsets.only(right: 20),
                                         child: Column(
                                           children: [
                                             buildText(content: 'SignedIn '),
                                             buildText(
                                                 content:
-                                                    gymReportItem.signInTime,
+                                                gymReportItem.signInTime,
                                                 isContentStyleView: true),
                                           ],
                                         ),
@@ -199,7 +200,7 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
         style: isContentStyleView
             ? const TextStyle(color: Colors.white)
             : const TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
       ),
     );
   }

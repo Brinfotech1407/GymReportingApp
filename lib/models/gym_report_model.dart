@@ -8,6 +8,7 @@ class GymReportModel {
   String id;
   String gymId;
   String userId;
+  String userName;
   String date;
   String signInTime;
   String signOutTime;
@@ -20,12 +21,13 @@ class GymReportModel {
     required this.date,
     required this.signInTime,
     required this.signOutTime,
+    required this.userName,
     this.isUserSignedOutForDay = false,
   });
 
   @override
   List<Object?> get props =>
-      [id, gymId, userId, date, signInTime, signOutTime, isUserSignedOutForDay];
+      [id, gymId, userId, date, signInTime, signOutTime, isUserSignedOutForDay,userName];
 
   /// Connect the generated [_$GymReportFromJson] function to the `fromJson`
   /// factory.

@@ -14,6 +14,7 @@ GymReportModel _$GymReportModelFromJson(Map<String, dynamic> json) =>
       date: json['date'] as String,
       signInTime: json['signInTime'] as String,
       signOutTime: json['signOutTime'] as String,
+      userName: json['userName'] as String,
       isUserSignedOutForDay: json['isUserSignedOutForDay'] as bool? ?? false,
     );
 
@@ -22,6 +23,7 @@ Map<String, dynamic> _$GymReportModelToJson(GymReportModel instance) =>
       'id': instance.id,
       'gymId': instance.gymId,
       'userId': instance.userId,
+      'userName': instance.userName,
       'date': instance.date,
       'signInTime': instance.signInTime,
       'signOutTime': instance.signOutTime,

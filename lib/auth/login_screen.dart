@@ -121,14 +121,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (_emailController.text.isNotEmpty &&
                         _pwdController.text.isNotEmpty) {
                       if (isLoaded.value == true) {
-                        Get.to(const LoaderScreen(
+                        const LoaderScreen(
                           isFullScreen: false,
-                        ));
+                        );
                       }
                       isLoaded.value = false;
                       await AuthController.instance.loginUser(
                           _emailController.text, _pwdController.text, context);
-
                     }
                   },
                   buttonName: 'Login'),

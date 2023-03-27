@@ -119,9 +119,9 @@ class _GymDetailsScreenState extends State<GymDetailsScreen> {
                 isLoaded.toggle();
                 if (isDataNotEmpty()) {
                   if (isLoaded.value == true) {
-                    Get.to(const LoaderScreen(
+                    const LoaderScreen(
                       isFullScreen: false,
-                    ));
+                    );
                   }
                   await setGymDetails(context);
 

@@ -270,9 +270,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         _ageController.text.isNotEmpty &&
                         _phoneController.text.isNotEmpty) {
                       if (isLoaded.value == true) {
-                        Get.to(const LoaderScreen(
+                        const LoaderScreen(
                           isFullScreen: false,
-                        ));
+                        );
                       }
                       final UserModel userData = UserModel(
                         email: _emailController.text,

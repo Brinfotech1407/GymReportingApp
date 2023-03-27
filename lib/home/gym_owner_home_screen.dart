@@ -10,6 +10,7 @@ import 'package:gim_app/models/gym_report_model.dart';
 import 'package:gim_app/services/database.dart';
 import 'package:gim_app/utils/date_time_utils.dart';
 import 'package:gim_app/utils/gym_utils.dart';
+import 'package:gim_app/waiting/LoaderScreen.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:intl/intl.dart';
 
@@ -36,29 +37,27 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: Database().fetchGymReport(selectedDate.value),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          }
+          stream: Database().fetchGymReport(selectedDate.value),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(
+                child: Text('Error: ${snapshot.error}'),
+              );
+            }
 
-          if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+            if (!snapshot.hasData) {
+              return const LoaderScreen(
+                isFullScreen: false,
+              );
+            }
 
-          final List<GymReportModel> arrGymReports = snapshot.data!.docs
-              .map((QueryDocumentSnapshot<Map<String, dynamic>> e) =>
-                  GymReportModel.fromJson(e.data()))
-              .toList();
-
-          return SafeArea(
-            child: Container(
-              decoration: GymUtils().buildBoxDecoration(),
-              child: Column(
+            final List<GymReportModel> arrGymReports = snapshot.data!.docs
+                .map((QueryDocumentSnapshot<Map<String, dynamic>> e) =>
+                    GymReportModel.fromJson(e.data()))
+                .toList();
+            print('arrGymReports $arrGymReports');
+              return buildListView(
+                  child: Column(
                 children: [
                   Obx(
                     () => Row(
@@ -109,86 +108,101 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                       ],
                     ),
                   ),
-                  Expanded(
-                    child: ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      itemCount: arrGymReports.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        GymReportModel gymReportItem = arrGymReports[index];
-                        return SizedBox(
-                          height: 170,
-                          child: Card(
-                            color: Colors.transparent,
-                            margin: const EdgeInsets.all(12),
-                            elevation: 0.5,
-                            shadowColor: Colors.blue,
-                            shape: const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(12)),
-                                side: BorderSide(
-                                  color: Colors.white,
-                                )),
-                            child: Padding(
-                              padding: const EdgeInsets.all(14),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      buildText(content: 'name: '),
-                                      buildText(
-                                          content: gymReportItem.userName,
-                                          isContentStyleView: true),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      buildText(content: 'Date: '),
-                                      buildText(
-                                          content: gymReportItem.date,
-                                          isContentStyleView: true),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 20),
-                                        child: Column(
-                                          children: [
-                                            buildText(content: 'SignedIn '),
-                                            buildText(
-                                                content:
-                                                    gymReportItem.signInTime,
-                                                isContentStyleView: true),
-                                          ],
-                                        ),
-                                      ),
-                                      Column(
-                                        children: [
-                                          buildText(content: 'SignedOut '),
-                                          buildText(
-                                            content: gymReportItem.signOutTime,
-                                            isContentStyleView: true,
+                  if (snapshot.data!.docs.isNotEmpty) ...[
+                    Expanded(
+                      child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        itemCount: arrGymReports.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          GymReportModel gymReportItem = arrGymReports[index];
+                          return SizedBox(
+                            height: 170,
+                            child: Card(
+                              color: Colors.transparent,
+                              margin: const EdgeInsets.all(12),
+                              elevation: 0.5,
+                              shadowColor: Colors.blue,
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(12)),
+                                  side: BorderSide(
+                                    color: Colors.white,
+                                  )),
+                              child: Padding(
+                                padding: const EdgeInsets.all(14),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        buildText(content: 'name: '),
+                                        buildText(
+                                            content: gymReportItem.userName,
+                                            isContentStyleView: true),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        buildText(content: 'Date: '),
+                                        buildText(
+                                            content: gymReportItem.date,
+                                            isContentStyleView: true),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Padding(
+                                          padding:
+                                          const EdgeInsets.only(right: 20),
+                                          child: Column(
+                                            children: [
+                                              buildText(content: 'SignedIn '),
+                                              buildText(
+                                                  content:
+                                                  gymReportItem.signInTime,
+                                                  isContentStyleView: true),
+                                            ],
                                           ),
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                ],
+                                        ),
+                                        Column(
+                                          children: [
+                                            buildText(content: 'SignedOut '),
+                                            buildText(
+                                              content: gymReportItem.signOutTime,
+                                              isContentStyleView: true,
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
-                  ),
+                  ]else ...[
+                    const Padding(
+                      padding: EdgeInsets.only(top: 30),
+                      child: Text('No Data Found',
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
+
                 ],
-              ),
-            ),
-          );
-        },
+              ));
+          }),
+    );
+  }
+
+  SafeArea buildListView({required Widget child}) {
+    return SafeArea(
+      child: Container(
+        decoration: GymUtils().buildBoxDecoration(),
+        child: child,
       ),
     );
   }
@@ -229,7 +243,7 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                   setState(() {
                     showFilterIcon.value = true;
                     isDateFilterView.value = false;
-                    selectedDate = DateTimeUtils().getCurrentDate().obs;
+                    selectedDate.value = DateTimeUtils().getCurrentDate();
                   });
                 },
                 icon: const Icon(
@@ -261,17 +275,16 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
   Container filterButtonView(String buttonName, bool isSelectFilter) {
     return Container(
       decoration: BoxDecoration(
-        color: isSelectFilter ? Colors.purple.shade900 : Colors.blue,
+        color: isSelectFilter ? Colors.purple.shade600 : Colors.blue,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white),
       ),
       margin: const EdgeInsets.only(bottom: 16, top: 16, right: 8, left: 8),
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: Text(
-        buttonName,
+        isSelectFilter ? '$buttonName: ${selectedDate.value}' : buttonName,
         style: const TextStyle(
-          color: /*selected ?*/ Colors.white,
-          /*: Colors.blue,*/
+          color: Colors.white,
           fontWeight: FontWeight.bold,
         ),
       ),

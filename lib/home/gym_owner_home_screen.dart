@@ -24,20 +24,25 @@ class GymOwnerHomeScreen extends StatefulWidget {
 class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
   RxBool showFilterIcon = true.obs;
   RxBool isDateFilterView = false.obs;
+  RxBool isNameFilterView = false.obs;
   List<GymReportModel> arrDateFilterList = [];
   Rx<String> selectedDate = DateTimeUtils().getCurrentDate().obs;
+  String selectedName = '';
+  TextEditingController searchNameController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     selectedDate;
+    selectedName;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          stream: Database().fetchGymReport(selectedDate.value),
+          stream: Database().fetchGymReport(
+              date: selectedDate.value, searchString: selectedName),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Center(
@@ -55,7 +60,6 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                 .map((QueryDocumentSnapshot<Map<String, dynamic>> e) =>
                     GymReportModel.fromJson(e.data()))
                 .toList();
-            print('arrGymReports $arrGymReports');
             return buildListView(
                 child: Column(
               children: [
@@ -99,11 +103,50 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                               )),
                         ),
                       ] else ...[
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: filterView(
-                              context: context, gymReportData: arrGymReports),
-                        ),
+                        if (isNameFilterView.isTrue) ...[
+                          Container(
+                            margin: const EdgeInsets.only(top: 16),
+                            padding: const EdgeInsets.all(10),
+                            width: MediaQuery.of(context).size.width,
+                            child: TextField(
+                              controller: searchNameController,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedName = value;
+                                });
+                              },
+                              decoration: InputDecoration(
+                                hintText: 'Search text',
+                                hintStyle:
+                                    const TextStyle(color: Colors.white54),
+                                border: buildOutlineInputBorder(),
+                                focusedBorder: buildOutlineInputBorder(),
+                                disabledBorder: buildOutlineInputBorder(),
+                                enabledBorder: buildOutlineInputBorder(),
+                                contentPadding: const EdgeInsets.all(8),
+                                suffixIcon: IconButton(
+                                  icon: const Icon(Icons.search,
+                                      color: Colors.white),
+                                  onPressed: () {
+                                    setState(() {
+                                      isNameFilterView.value = false;
+                                    });
+                                  },
+                                ),
+                              ),
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500),
+                              cursorColor: Colors.white,
+                            ),
+                          ),
+                        ] else ...[
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: filterView(
+                                context: context, gymReportData: arrGymReports),
+                          ),
+                        ],
                       ],
                     ],
                   ),
@@ -197,6 +240,13 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
     );
   }
 
+  OutlineInputBorder buildOutlineInputBorder() {
+    return OutlineInputBorder(
+      borderSide: const BorderSide(color: Colors.white, width: 1),
+      borderRadius: BorderRadius.circular(20),
+    );
+  }
+
   SafeArea buildListView({required Widget child}) {
     return SafeArea(
       child: Container(
@@ -228,20 +278,33 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             GestureDetector(
-              onTap: () {},
-              child: filterButtonView('name', false),
+              onTap: () {
+                setState(() {
+                  isNameFilterView.value = true;
+                  print('name ${selectedName}');
+                });
+              },
+              child: filterButtonView(
+                  buttonName: 'name',
+                  isNameFilter: isNameFilterView.isTrue,
+                  isDateFilter: false),
             ),
             GestureDetector(
               onTap: () {
                 _selectDate(context);
               },
-              child: filterButtonView('date', isDateFilterView.isTrue),
+              child: filterButtonView(
+                  buttonName: 'date',
+                  isDateFilter: isDateFilterView.isTrue,
+                  isNameFilter: false),
             ),
             IconButton(
                 onPressed: () async {
                   setState(() {
                     showFilterIcon.value = true;
                     isDateFilterView.value = false;
+                    isNameFilterView.value = false;
+                    selectedName = '';
                     selectedDate.value = DateTimeUtils().getCurrentDate();
                   });
                 },
@@ -271,53 +334,51 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
     }
   }
 
-  Container filterButtonView(String buttonName, bool isSelectFilter) {
+  Container filterButtonView(
+      {required String buttonName,
+      required bool isDateFilter,
+      required bool isNameFilter}) {
     return Container(
       decoration: BoxDecoration(
-        color: isSelectFilter ? Colors.purple.shade600 : Colors.blue,
+        color: isDateFilter ? Colors.purple.shade600 : Colors.blue,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white),
       ),
       margin: const EdgeInsets.only(bottom: 16, top: 16, right: 8, left: 8),
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: isSelectFilter
-          ? SingleChildScrollView(
-            child: Row(
-                children: [
-                  Text(
-                    isSelectFilter
-                        ? '$buttonName: ${selectedDate.value}'
-                        : buttonName,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  IconButton(
-                      constraints: const BoxConstraints(),
-                      padding: const EdgeInsets.only(left: 4),
-                      onPressed: () async {
-                        setState(() {
-                          isDateFilterView.value = false;
-                          selectedDate.value = DateTimeUtils().getCurrentDate();
-                        });
-                      },
-                      icon: const Icon(
-                        Icons.close,
-                        color: Colors.white,
-                      )),
-                ],
-              ),
-          )
-          : Text(
-              isSelectFilter
+      child: SingleChildScrollView(
+        child: Row(
+          children: [
+            Text(
+              isDateFilter
                   ? '$buttonName: ${selectedDate.value}'
-                  : buttonName,
+                  : isNameFilter
+                      ? '$buttonName: ${selectedName}'
+                      : buttonName,
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
             ),
+            if (isDateFilter != false) ...[
+              IconButton(
+                  constraints: const BoxConstraints(),
+                  padding: const EdgeInsets.only(left: 4),
+                  onPressed: () async {
+                    setState(() {
+                      isDateFilterView.value = false;
+                      selectedDate.value = DateTimeUtils().getCurrentDate();
+                      selectedName = '';
+                    });
+                  },
+                  icon: const Icon(
+                    Icons.close,
+                    color: Colors.white,
+                  )),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

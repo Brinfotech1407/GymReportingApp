@@ -122,13 +122,19 @@ class Database {
     return gymReportData.id;
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> fetchGymReport(String date) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> fetchGymReport(
+      {required String date, required String searchString}) {
     String? gymId = _preferenceService.getString(PreferenceService.gymID);
-    return FirebaseFirestore.instance
+    Query<Map<String, dynamic>> query = FirebaseFirestore.instance
         .collection('gym_report')
         .where("date", isEqualTo: date)
-        .where("gymId", isEqualTo: gymId)
-        .snapshots();
+        .where("gymId", isEqualTo: gymId);
+
+    if (searchString.isNotEmpty) {
+      query.where("userName", arrayContains: searchString);
+    }
+
+    return query.snapshots();
   }
 
   Future<GymReportModel?> getSingleGymReportData(String uid) async {

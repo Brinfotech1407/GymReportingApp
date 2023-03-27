@@ -60,14 +60,15 @@ class Database {
 
   Future<UserModel?> getUser(String uid) async {
     try {
-      final DocumentSnapshot<Map<String, dynamic>> doc = (await _firestore
+      final QuerySnapshot<Map<String, dynamic>> doc = (await _firestore
           .collection('users')
           .where('id', isEqualTo: uid)
-          .get()) as DocumentSnapshot<Map<String, dynamic>>;
+          .get());
 
-      if (doc.exists) {
-        final UserModel user = UserModel.fromJson(doc.data()!);
-        return user;
+      if (doc.docs.isNotEmpty) {
+        final UserModel userModel =
+        UserModel.fromJson(doc.docs.first.data());
+        return userModel;
       } else {
         return null;
       }

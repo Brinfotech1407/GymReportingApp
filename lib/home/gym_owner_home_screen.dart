@@ -25,9 +25,10 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
   RxBool showFilterIcon = true.obs;
   RxBool isDateFilterView = false.obs;
   RxBool isNameFilterView = false.obs;
+  RxBool showTextFiledView = false.obs;
   List<GymReportModel> arrDateFilterList = [];
   Rx<String> selectedDate = DateTimeUtils().getCurrentDate().obs;
-  String selectedName = '';
+  Rx<String>  selectedName = ''.obs;
   TextEditingController searchNameController = TextEditingController();
   List<QueryDocumentSnapshot<Map<String, dynamic>>> documents = [];
 
@@ -42,7 +43,7 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
     return Scaffold(
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
           stream: Database().fetchGymReport(
-              date: selectedDate.value, searchString: selectedName),
+              date: selectedDate.value, searchString: selectedName.value),
           builder: (context, snapshot) {
 
             if (snapshot.connectionState ==
@@ -53,14 +54,13 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                   ));
             }
              documents = snapshot.data!.docs;
-            //todo Documents list added to filterTitle
-            if (selectedName.isNotEmpty) {
+            if (selectedName.value.isNotEmpty) {
               documents = documents.where((element) {
                 return element
                     .get('userName')
                     .toString()
                     .toLowerCase()
-                    .contains(selectedName.toLowerCase());
+                    .contains(selectedName.value.toLowerCase());
               }).toList();
             }
 
@@ -123,18 +123,18 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                               )),
                         ),
                       ] else ...[
-                        if (isNameFilterView.isTrue) ...[
+                        if (showTextFiledView.isTrue) ...[
                           Container(
                             margin: const EdgeInsets.only(top: 16),
                             padding: const EdgeInsets.all(10),
                             width: MediaQuery.of(context).size.width,
                             child: TextField(
                               controller: searchNameController,
-                              onChanged: (value) {
+                             /* onChanged: (value) {
                                 setState(() {
                                   selectedName = value;
                                 });
-                              },
+                              },*/
                               decoration: InputDecoration(
                                 hintText: 'Search text',
                                 hintStyle:
@@ -148,9 +148,14 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                                   icon: const Icon(Icons.search,
                                       color: Colors.white),
                                   onPressed: () {
-                                      selectedName = searchNameController.text;
-                                      isNameFilterView.value = false;
-                                      print('serach IconTap selected name ${ searchNameController.text}');
+                                      setState(() {
+                                        showTextFiledView.value=false;
+                                        selectedName.value = searchNameController.text;
+                                        if(selectedName.isNotEmpty) {
+                                          isNameFilterView.value = true;
+                                          searchNameController.clear();
+                                        }
+                                      });
                                   },
                                 ),
                               ),
@@ -300,22 +305,31 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
             GestureDetector(
               onTap: () {
                 setState(() {
-                  isNameFilterView.value = true;
+                  showTextFiledView.value =true;
                 });
               },
               child: filterButtonView(
-                  buttonName: 'name',
-                  isNameFilter: isNameFilterView.isTrue,
-                  isDateFilter: false),
+                  buttonName: isNameFilterView.isTrue ?'name: ${selectedName.value}':'name',
+                  isSelectedFilterColors: isNameFilterView.isTrue,
+                onCloseIconTap: () {
+                  isNameFilterView.value =false;
+                  selectedName.value = '';
+                  searchNameController.clear();
+                },
+              ),
             ),
             GestureDetector(
               onTap: () {
                 _selectDate(context);
               },
               child: filterButtonView(
-                  buttonName: 'date',
-                  isDateFilter: isDateFilterView.isTrue,
-                  isNameFilter: false),
+                  buttonName: isDateFilterView.isTrue ?'date: ${selectedDate.value}' :'date',
+              isSelectedFilterColors: isDateFilterView.isTrue,
+                onCloseIconTap: () {
+                  isDateFilterView.value = false;
+                  selectedDate.value = DateTimeUtils().getCurrentDate();
+                },
+              ),
             ),
             IconButton(
                 onPressed: () async {
@@ -323,7 +337,7 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                     showFilterIcon.value = true;
                     isDateFilterView.value = false;
                     isNameFilterView.value = false;
-                    selectedName = '';
+                    selectedName.value = '';
                     selectedDate.value = DateTimeUtils().getCurrentDate();
                   });
                 },
@@ -355,11 +369,11 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
 
   Container filterButtonView(
       {required String buttonName,
-      required bool isDateFilter,
-      required bool isNameFilter}) {
+      required bool isSelectedFilterColors,
+        required Function() onCloseIconTap}) {
     return Container(
       decoration: BoxDecoration(
-        color: isDateFilter ? Colors.purple.shade600 : Colors.blue,
+        color: isSelectedFilterColors ? Colors.purple.shade600 : Colors.blue,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white),
       ),
@@ -369,26 +383,18 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
         child: Row(
           children: [
             Text(
-              isDateFilter
-                  ? '$buttonName: ${selectedDate.value}'
-                  : isNameFilter
-                      ? '$buttonName: ${selectedName}'
-                      : buttonName,
+             buttonName,
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            if (isDateFilter != false) ...[
+            if (isSelectedFilterColors != false) ...[
               IconButton(
                   constraints: const BoxConstraints(),
                   padding: const EdgeInsets.only(left: 4),
                   onPressed: () async {
-                    setState(() {
-                      isDateFilterView.value = false;
-                      selectedDate.value = DateTimeUtils().getCurrentDate();
-                      selectedName = '';
-                    });
+                      onCloseIconTap();
                   },
                   icon: const Icon(
                     Icons.close,

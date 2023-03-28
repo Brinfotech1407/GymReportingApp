@@ -41,16 +41,18 @@ class Database {
         );
         throw "Email already exists";
       } else {
-        // Add user data to Firestore
+        if (userData.email != null && userData.password != null) {
+          await auth.createUserWithEmailAndPassword(
+              email: userData.email!, password: userData.password!);
+        }
+        // Add user Id  to Firestore
+        userData.id =auth.currentUser!.uid;
+
         await _firestore
             .collection("users")
             .doc(userData.email)
             .set(userData.toJson(), SetOptions(merge: true));
 
-        if (userData.email != null && userData.password != null) {
-          await auth.createUserWithEmailAndPassword(
-              email: userData.email!, password: userData.password!);
-        }
       }
     } on Exception catch (e) {
       log('Exception $e');

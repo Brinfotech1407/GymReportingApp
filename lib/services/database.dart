@@ -48,7 +48,7 @@ class Database {
         // Add user Id  to Firestore
         userData.id =auth.currentUser!.uid;
 
-        await _firestore
+          await _firestore
             .collection("users")
             .doc(userData.email)
             .set(userData.toJson(), SetOptions(merge: true));

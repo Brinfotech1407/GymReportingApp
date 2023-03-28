@@ -8,6 +8,7 @@ import 'package:gim_app/auth/login_screen.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
 import 'package:gim_app/models/gym_report_model.dart';
 import 'package:gim_app/services/database.dart';
+import 'package:gim_app/services/preference_service.dart';
 import 'package:gim_app/utils/date_time_utils.dart';
 import 'package:gim_app/utils/gym_utils.dart';
 import 'package:quickalert/quickalert.dart';
@@ -30,10 +31,13 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
   Rx<String> selectedName = ''.obs;
   TextEditingController searchNameController = TextEditingController();
   List<QueryDocumentSnapshot<Map<String, dynamic>>> documents = [];
+  final PreferenceService _preferenceService = PreferenceService();
+  String ownerName = '';
 
   @override
   void initState() {
     super.initState();
+     ownerName = _preferenceService.getString(PreferenceService.userName) ?? '';
   }
 
   @override
@@ -61,138 +65,139 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                         GymReportModel.fromJson(e.data()))
                     .toList();
 
-                  return Builder(
-                    builder: (context) {
-                        if(snapshot.hasData){
-                            return Obx(() {
-                              return Column(
-                                children: [
-                                  if (showFilterIcon.isTrue) ...[
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        filterIconButton(),
-                                        logoutIconButton(context),
-                                      ],
-                                    ),
-                                  ] else ...[
-                                    if (showTextFiledView.isTrue) ...[
-                                      textFiledView(context),
-                                    ] else ...[
-                                      filterView(
-                                          context: context, gymReportData: arrGymReports),
-                                    ],
-                                  ],
-                              if (documents.isEmpty) ...[
-                                const Expanded(
-                                  child:  Center(
+
+                if (snapshot.hasData) {
+                  return Obx(() {
+                    return Column(
+                      children: [
+                        if (showFilterIcon.isTrue) ...[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              filterIconButton(),
+                              logoutIconButton(context),
+                            ],
+                          ),
+                        ] else ...[
+                          if (showTextFiledView.isTrue) ...[
+                            textFiledView(context),
+                          ] else ...[
+                            filterView(
+                                context: context, gymReportData: arrGymReports),
+                          ],
+                        ],
+
+                         Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 16),
+                            child: Text(
+                                'Hi, ${ownerName}',
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,fontSize: 22)),
+                          ),
+                        ),
+                        if (documents.isEmpty) ...[
+                          const Expanded(
+                            child: Center(
                               child: Text("No data found.",
-                              style: TextStyle(color: Colors.white,fontSize: 17)),
-                              ),
-                                ),
-                              ]else...[
-                                Expanded(
-                                  child: ListView.builder(
-                                    scrollDirection: Axis.vertical,
-                                    itemCount: arrGymReports.length,
-                                    itemBuilder: (BuildContext context,
-                                        int index) {
-                                      GymReportModel gymReportItem = arrGymReports[index];
-                                      return SizedBox(
-                                        height: 170,
-                                        child: Card(
-                                          color: Colors.transparent,
-                                          margin: const EdgeInsets.all(12),
-                                          elevation: 0.5,
-                                          shadowColor: Colors.blue,
-                                          shape: const RoundedRectangleBorder(
-                                              borderRadius:
-                                              BorderRadius.all(
-                                                  Radius.circular(12)),
-                                              side: BorderSide(
-                                                color: Colors.white,
-                                              )),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(14),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment: CrossAxisAlignment
-                                                  .start,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    buildText(
-                                                        content: 'name: '),
-                                                    buildText(
-                                                        content: gymReportItem
-                                                            .userName,
-                                                        isContentStyleView: true),
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    buildText(
-                                                        content: 'Date: '),
-                                                    buildText(
-                                                        content: gymReportItem
-                                                            .date,
-                                                        isContentStyleView: true),
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Padding(
-                                                      padding:
-                                                      const EdgeInsets.only(
-                                                          right: 20),
-                                                      child: Column(
-                                                        children: [
-                                                          buildText(
-                                                              content: 'SignedIn '),
-                                                          buildText(
-                                                              content:
-                                                              gymReportItem
-                                                                  .signInTime,
-                                                              isContentStyleView: true),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Column(
-                                                      children: [
-                                                        buildText(
-                                                            content: 'SignedOut '),
-                                                        buildText(
-                                                          content: gymReportItem
-                                                              .signOutTime,
-                                                          isContentStyleView: true,
-                                                        ),
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 17)),
+                            ),
+                          ),
+                        ] else ...[
+                          Expanded(
+                            child: ListView.builder(
+                              scrollDirection: Axis.vertical,
+                              itemCount: arrGymReports.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                GymReportModel gymReportItem =
+                                    arrGymReports[index];
+                                return SizedBox(
+                                  height: 170,
+                                  child: Card(
+                                    color: Colors.transparent,
+                                    margin: const EdgeInsets.all(12),
+                                    elevation: 0.5,
+                                    shadowColor: Colors.blue,
+                                    shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(12)),
+                                        side: BorderSide(
+                                          color: Colors.white,
+                                        )),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(14),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              buildText(content: 'name: '),
+                                              buildText(
+                                                  content:
+                                                      gymReportItem.userName,
+                                                  isContentStyleView: true),
+                                            ],
                                           ),
-                                        ),
-                                      );
-                                    },
+                                          Row(
+                                            children: [
+                                              buildText(content: 'Date: '),
+                                              buildText(
+                                                  content: gymReportItem.date,
+                                                  isContentStyleView: true),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 20),
+                                                child: Column(
+                                                  children: [
+                                                    buildText(
+                                                        content: 'SignedIn '),
+                                                    buildText(
+                                                        content: gymReportItem
+                                                            .signInTime,
+                                                        isContentStyleView:
+                                                            true),
+                                                  ],
+                                                ),
+                                              ),
+                                              Column(
+                                                children: [
+                                                  buildText(
+                                                      content: 'SignedOut '),
+                                                  buildText(
+                                                    content: gymReportItem
+                                                        .signOutTime,
+                                                    isContentStyleView: true,
+                                                  ),
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ]
-                                ],
-                              );
-                            });
-                        }else if (snapshot.hasError) {
-                          return Center(
-                            child: Text("Error: ${snapshot.error}"),
-                          );
-                        } else {
-                          return const Center(
-                            child: CircularProgressIndicator(color: Colors.grey),
-                          );
-                        }
-                    },
+                                );
+                              },
+                            ),
+                          ),
+                        ]
+                      ],
+                    );
+                  });
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(color: Colors.grey),
                   );
+                }
               }),
         ),
       ),
@@ -329,13 +334,13 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
               },
               child: filterButtonView(
                 buttonName: isNameFilterView.isTrue
-                    ? 'name: ${selectedName.value}'
-                    : 'name',
+                    ? 'Name: ${selectedName.value}'
+                    : 'Name',
                 isSelectedFilterColors: isNameFilterView.isTrue,
                 onCloseIconTap: () {
                   setState(() {
                     isNameFilterView.value = false;
-                    selectedName.value == null;
+                    selectedName.value = '';
                     searchNameController.clear();
                   });
                 },
@@ -347,8 +352,8 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
               },
               child: filterButtonView(
                 buttonName: isDateFilterView.isTrue
-                    ? 'date: ${selectedDate.value}'
-                    : 'date',
+                    ? 'Date: ${selectedDate.value}'
+                    : 'Date',
                 isSelectedFilterColors: isDateFilterView.isTrue,
                 onCloseIconTap: () {
                   setState(() {
@@ -401,7 +406,7 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
     return Container(
       decoration: BoxDecoration(
         color: isSelectedFilterColors ? Colors.purple.shade600 : Colors.blue,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.white),
       ),
       margin: const EdgeInsets.only(bottom: 16, top: 16, right: 8, left: 8),

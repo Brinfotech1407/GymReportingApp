@@ -130,12 +130,6 @@ class Database {
         .where("date", isEqualTo: date)
         .where("gymId", isEqualTo: gymId);
 
-    if (searchString.isNotEmpty) {
-      print('searchString $searchString');
-      print('date  $date');
-      query.where("userName", isEqualTo: searchString);
-    }
-
     return query.snapshots();
   }
 

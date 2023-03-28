@@ -29,7 +29,7 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
   Rx<String> selectedDate = DateTimeUtils().getCurrentDate().obs;
   String selectedName = '';
   TextEditingController searchNameController = TextEditingController();
-  List<DocumentSnapshot> documents = [];
+  List<QueryDocumentSnapshot<Map<String, dynamic>>> documents = [];
 
   @override
   void initState() {
@@ -52,7 +52,7 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                     color: Colors.lightGreen,
                   ));
             }
-            documents = snapshot.data!.docs;
+             documents = snapshot.data!.docs;
             //todo Documents list added to filterTitle
             if (selectedName.isNotEmpty) {
               documents = documents.where((element) {
@@ -63,14 +63,6 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                     .contains(selectedName.toLowerCase());
               }).toList();
             }
-
-
-
-
-
-
-
-
 
             if (snapshot.hasError) {
               return Center(
@@ -84,7 +76,7 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
               );
             }
 
-            final List<GymReportModel> arrGymReports = snapshot.data!.docs
+            final List<GymReportModel> arrGymReports = documents
                 .map((QueryDocumentSnapshot<Map<String, dynamic>> e) =>
                     GymReportModel.fromJson(e.data()))
                 .toList();
@@ -138,6 +130,11 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                             width: MediaQuery.of(context).size.width,
                             child: TextField(
                               controller: searchNameController,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedName = value;
+                                });
+                              },
                               decoration: InputDecoration(
                                 hintText: 'Search text',
                                 hintStyle:

@@ -29,12 +29,12 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
   Rx<String> selectedDate = DateTimeUtils().getCurrentDate().obs;
   String selectedName = '';
   TextEditingController searchNameController = TextEditingController();
+  List<DocumentSnapshot> documents = [];
 
   @override
   void initState() {
     super.initState();
     selectedDate;
-    selectedName;
   }
 
   @override
@@ -44,6 +44,34 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
           stream: Database().fetchGymReport(
               date: selectedDate.value, searchString: selectedName),
           builder: (context, snapshot) {
+
+            if (snapshot.connectionState ==
+                ConnectionState.waiting) {
+              return const Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.lightGreen,
+                  ));
+            }
+            documents = snapshot.data!.docs;
+            //todo Documents list added to filterTitle
+            if (selectedName.isNotEmpty) {
+              documents = documents.where((element) {
+                return element
+                    .get('userName')
+                    .toString()
+                    .toLowerCase()
+                    .contains(selectedName.toLowerCase());
+              }).toList();
+            }
+
+
+
+
+
+
+
+
+
             if (snapshot.hasError) {
               return Center(
                 child: Text('Error: ${snapshot.error}'),
@@ -110,11 +138,6 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                             width: MediaQuery.of(context).size.width,
                             child: TextField(
                               controller: searchNameController,
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedName = value;
-                                });
-                              },
                               decoration: InputDecoration(
                                 hintText: 'Search text',
                                 hintStyle:
@@ -128,9 +151,9 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                                   icon: const Icon(Icons.search,
                                       color: Colors.white),
                                   onPressed: () {
-                                    setState(() {
+                                      selectedName = searchNameController.text;
                                       isNameFilterView.value = false;
-                                    });
+                                      print('serach IconTap selected name ${ searchNameController.text}');
                                   },
                                 ),
                               ),
@@ -281,7 +304,6 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
               onTap: () {
                 setState(() {
                   isNameFilterView.value = true;
-                  print('name ${selectedName}');
                 });
               },
               child: filterButtonView(

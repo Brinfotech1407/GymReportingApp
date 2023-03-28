@@ -131,7 +131,9 @@ class Database {
         .where("gymId", isEqualTo: gymId);
 
     if (searchString.isNotEmpty) {
-      query.where("userName", arrayContains: searchString);
+      print('searchString $searchString');
+      print('date  $date');
+      query.where("userName", isEqualTo: searchString);
     }
 
     return query.snapshots();

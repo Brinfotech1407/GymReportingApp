@@ -28,14 +28,13 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
   RxBool showTextFiledView = false.obs;
   List<GymReportModel> arrDateFilterList = [];
   Rx<String> selectedDate = DateTimeUtils().getCurrentDate().obs;
-  Rx<String>  selectedName = ''.obs;
+  Rx<String> selectedName = ''.obs;
   TextEditingController searchNameController = TextEditingController();
   List<QueryDocumentSnapshot<Map<String, dynamic>>> documents = [];
 
   @override
   void initState() {
     super.initState();
-    selectedDate;
   }
 
   @override
@@ -45,15 +44,13 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
           stream: Database().fetchGymReport(
               date: selectedDate.value, searchString: selectedName.value),
           builder: (context, snapshot) {
-
-            if (snapshot.connectionState ==
-                ConnectionState.waiting) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
                   child: CircularProgressIndicator(
-                    color: Colors.lightGreen,
-                  ));
+                color: Colors.grey,
+              ));
             }
-             documents = snapshot.data!.docs;
+            documents = snapshot.data!.docs;
             if (selectedName.value.isNotEmpty) {
               documents = documents.where((element) {
                 return element
@@ -80,188 +77,195 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                 .map((QueryDocumentSnapshot<Map<String, dynamic>> e) =>
                     GymReportModel.fromJson(e.data()))
                 .toList();
-            return buildListView(
-                child: Column(
-              children: [
-                Obx(
-                  () => Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      if (showFilterIcon.isTrue) ...[
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 18),
-                          child: IconButton(
-                              onPressed: () async {
-                                showFilterIcon.value = false;
-                              },
-                              icon: const Icon(
-                                Icons.filter_list,
-                                color: Colors.white,
-                              )),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 18),
-                          child: IconButton(
-                              onPressed: () async {
-                                QuickAlert.show(
-                                  context: context,
-                                  type: QuickAlertType.confirm,
-                                  title: '',
-                                  cancelBtnText: 'No',
-                                  confirmBtnText: 'yes',
-                                  text:
-                                      "Are you sure you want to log out? Your session will be terminated and you will need to log in again to use the app.",
-                                  onConfirmBtnTap: () {
-                                    AuthController.instance.logout();
-                                    Get.to(() => const LoginScreen());
-                                  },
-                                );
-                              },
-                              icon: const Icon(
-                                Icons.logout,
-                                color: Colors.white,
-                              )),
-                        ),
-                      ] else ...[
-                        if (showTextFiledView.isTrue) ...[
-                          Container(
-                            margin: const EdgeInsets.only(top: 16),
-                            padding: const EdgeInsets.all(10),
-                            width: MediaQuery.of(context).size.width,
-                            child: TextField(
-                              controller: searchNameController,
-                             /* onChanged: (value) {
-                                setState(() {
-                                  selectedName = value;
-                                });
-                              },*/
-                              decoration: InputDecoration(
-                                hintText: 'Search text',
-                                hintStyle:
-                                    const TextStyle(color: Colors.white54),
-                                border: buildOutlineInputBorder(),
-                                focusedBorder: buildOutlineInputBorder(),
-                                disabledBorder: buildOutlineInputBorder(),
-                                enabledBorder: buildOutlineInputBorder(),
-                                contentPadding: const EdgeInsets.all(8),
-                                suffixIcon: IconButton(
-                                  icon: const Icon(Icons.search,
-                                      color: Colors.white),
-                                  onPressed: () {
-                                      setState(() {
-                                        showTextFiledView.value=false;
-                                        selectedName.value = searchNameController.text;
-                                        if(selectedName.isNotEmpty) {
-                                          isNameFilterView.value = true;
-                                          searchNameController.clear();
-                                        }
-                                      });
-                                  },
+            return buildListView(child: Obx(() {
+              return Column(
+                children: [
+                  if (showFilterIcon.isTrue) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        filterIconButton(),
+                        logoutIconButton(context),
+                      ],
+                    ),
+                  ] else ...[
+                    if (showTextFiledView.isTrue) ...[
+                      textFiledView(context),
+                    ] else ...[
+                      filterView(
+                          context: context, gymReportData: arrGymReports),
+                    ],
+                  ],
+                  if (snapshot.data!.docs.isNotEmpty) ...[
+                    Expanded(
+                      child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        itemCount: arrGymReports.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          GymReportModel gymReportItem = arrGymReports[index];
+                          return SizedBox(
+                            height: 170,
+                            child: Card(
+                              color: Colors.transparent,
+                              margin: const EdgeInsets.all(12),
+                              elevation: 0.5,
+                              shadowColor: Colors.blue,
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(12)),
+                                  side: BorderSide(
+                                    color: Colors.white,
+                                  )),
+                              child: Padding(
+                                padding: const EdgeInsets.all(14),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        buildText(content: 'name: '),
+                                        buildText(
+                                            content: gymReportItem.userName,
+                                            isContentStyleView: true),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        buildText(content: 'Date: '),
+                                        buildText(
+                                            content: gymReportItem.date,
+                                            isContentStyleView: true),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 20),
+                                          child: Column(
+                                            children: [
+                                              buildText(content: 'SignedIn '),
+                                              buildText(
+                                                  content:
+                                                      gymReportItem.signInTime,
+                                                  isContentStyleView: true),
+                                            ],
+                                          ),
+                                        ),
+                                        Column(
+                                          children: [
+                                            buildText(content: 'SignedOut '),
+                                            buildText(
+                                              content:
+                                                  gymReportItem.signOutTime,
+                                              isContentStyleView: true,
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500),
-                              cursorColor: Colors.white,
                             ),
-                          ),
-                        ] else ...[
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: filterView(
-                                context: context, gymReportData: arrGymReports),
-                          ),
-                        ],
-                      ],
-                    ],
-                  ),
-                ),
-                if (snapshot.data!.docs.isNotEmpty) ...[
-                  Expanded(
-                    child: ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      itemCount: arrGymReports.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        GymReportModel gymReportItem = arrGymReports[index];
-                        return SizedBox(
-                          height: 170,
-                          child: Card(
-                            color: Colors.transparent,
-                            margin: const EdgeInsets.all(12),
-                            elevation: 0.5,
-                            shadowColor: Colors.blue,
-                            shape: const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(12)),
-                                side: BorderSide(
-                                  color: Colors.white,
-                                )),
-                            child: Padding(
-                              padding: const EdgeInsets.all(14),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      buildText(content: 'name: '),
-                                      buildText(
-                                          content: gymReportItem.userName,
-                                          isContentStyleView: true),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      buildText(content: 'Date: '),
-                                      buildText(
-                                          content: gymReportItem.date,
-                                          isContentStyleView: true),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 20),
-                                        child: Column(
-                                          children: [
-                                            buildText(content: 'SignedIn '),
-                                            buildText(
-                                                content:
-                                                    gymReportItem.signInTime,
-                                                isContentStyleView: true),
-                                          ],
-                                        ),
-                                      ),
-                                      Column(
-                                        children: [
-                                          buildText(content: 'SignedOut '),
-                                          buildText(
-                                            content: gymReportItem.signOutTime,
-                                            isContentStyleView: true,
-                                          ),
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ] else ...[
-                  const Padding(
-                    padding: EdgeInsets.only(top: 30),
-                    child: Text('No Data Found',
-                        style: TextStyle(color: Colors.white)),
-                  ),
+                  ] else ...[
+                    const Padding(
+                      padding: EdgeInsets.only(top: 30),
+                      child: Text('No Data Found',
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
                 ],
-              ],
-            ));
+              );
+            }));
           }),
+    );
+  }
+
+  Container textFiledView(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 16),
+      padding: const EdgeInsets.all(10),
+      width: MediaQuery.of(context).size.width,
+      child: TextField(
+        controller: searchNameController,
+        decoration: InputDecoration(
+          hintText: 'Search text',
+          hintStyle: const TextStyle(color: Colors.white54),
+          border: buildOutlineInputBorder(),
+          focusedBorder: buildOutlineInputBorder(),
+          disabledBorder: buildOutlineInputBorder(),
+          enabledBorder: buildOutlineInputBorder(),
+          contentPadding: const EdgeInsets.all(8),
+          suffixIcon: IconButton(
+            icon: const Icon(Icons.search, color: Colors.white),
+            onPressed: () {
+              setState(() {
+                showTextFiledView.value = false;
+                selectedName.value = searchNameController.text;
+                if (selectedName.isNotEmpty) {
+                  isNameFilterView.value = true;
+                  searchNameController.clear();
+                }
+              });
+            },
+          ),
+        ),
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+        cursorColor: Colors.white,
+      ),
+    );
+  }
+
+  Widget logoutIconButton(BuildContext context) {
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 18),
+        child: IconButton(
+            onPressed: () async {
+              QuickAlert.show(
+                context: context,
+                type: QuickAlertType.confirm,
+                title: '',
+                cancelBtnText: 'No',
+                confirmBtnText: 'yes',
+                text:
+                    "Are you sure you want to log out? Your session will be terminated and you will need to log in again to use the app.",
+                onConfirmBtnTap: () {
+                  AuthController.instance.logout();
+                  Get.to(() => const LoginScreen());
+                },
+              );
+            },
+            icon: const Icon(
+              Icons.logout,
+              color: Colors.white,
+            )),
+      ),
+    );
+  }
+
+  Widget filterIconButton() {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 18),
+        child: IconButton(
+            onPressed: () async {
+              showFilterIcon.value = false;
+            },
+            icon: const Icon(
+              Icons.filter_list,
+              color: Colors.white,
+            )),
+      ),
     );
   }
 
@@ -297,10 +301,12 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
   Widget filterView(
       {required BuildContext context,
       required List<GymReportModel> gymReportData}) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+    return Align(
+      alignment: Alignment.centerRight,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
             GestureDetector(
               onTap: () {
@@ -347,7 +353,7 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                 )),
           ],
         ),
-      ],
+      ),
     );
   }
 
@@ -367,10 +373,10 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
     }
   }
 
-  Container filterButtonView(
+  Widget filterButtonView(
       {required String buttonName,
       required bool isSelectedFilterColors,
-        required Function() onCloseIconTap}) {
+      required Function() onCloseIconTap}) {
     return Container(
       decoration: BoxDecoration(
         color: isSelectedFilterColors ? Colors.purple.shade600 : Colors.blue,
@@ -383,7 +389,7 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
         child: Row(
           children: [
             Text(
-             buttonName,
+              buttonName,
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -394,7 +400,7 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                   constraints: const BoxConstraints(),
                   padding: const EdgeInsets.only(left: 4),
                   onPressed: () async {
-                      onCloseIconTap();
+                    onCloseIconTap();
                   },
                   icon: const Icon(
                     Icons.close,

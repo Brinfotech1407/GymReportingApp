@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/Home/gym_owner_home_screen.dart';
 import 'package:gim_app/Home/home_screen.dart';
@@ -199,5 +200,14 @@ class GymUtils {
       //for rebuilding the ui
       selectedDate.value = pickedDate;
     });
+  }
+
+
+  toastMessageView({required String toastMessage}){
+    Fluttertoast.showToast(
+      msg: toastMessage,
+      backgroundColor: Colors.grey[600],
+    );
+
   }
 }

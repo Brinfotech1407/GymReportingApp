@@ -306,14 +306,18 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
       alignment: Alignment.centerRight,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 18),
-        child: IconButton(
-            onPressed: () async {
-              showFilterIcon.value = false;
-            },
-            icon: const Icon(
-              Icons.filter_list,
-              color: Colors.white,
-            )),
+        child: GestureDetector(
+          onTap: () {
+            showFilterIcon.value = false;
+          },
+          child:
+          Image.asset(
+            'assets/fonts/filter.png',
+            width: 27.0,
+            height: 27.0,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }
@@ -385,20 +389,26 @@ class _GymOwnerHomeScreenState extends State<GymOwnerHomeScreen> {
                 },
               ),
             ),
-            IconButton(
-                onPressed: () async {
-                  setState(() {
-                    showFilterIcon.value = true;
-                    isDateFilterView.value = false;
-                    isNameFilterView.value = false;
-                    selectedName.value = '';
-                    selectedDate.value = DateTimeUtils().getCurrentDate();
-                  });
-                },
-                icon: const Icon(
-                  Icons.close,
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  showFilterIcon.value = true;
+                  isDateFilterView.value = false;
+                  isNameFilterView.value = false;
+                  selectedName.value = '';
+                  selectedDate.value = DateTimeUtils().getCurrentDate();
+                });
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(left: 6.0,right: 8,bottom: 4),
+                child: Image.asset(
+                  'assets/fonts/filter_close.png',
+                  width: 30.0,
+                  height: 30.0,
                   color: Colors.white,
-                )),
+                ),
+              ),
+            ),
           ],
         ),
       ),

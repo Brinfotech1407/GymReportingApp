@@ -1,7 +1,9 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/auth/login_screen.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
+import 'package:gim_app/controllers/notification_controller.dart';
 import 'package:gim_app/models/gym_details.dart';
 import 'package:gim_app/models/gym_report_model.dart';
 import 'package:gim_app/models/user.dart';
@@ -43,6 +45,12 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void initState() {
+    AwesomeNotifications().isNotificationAllowed().then((value) {
+      if (!value) {
+        AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+    });
+
     if (isStarted.isTrue) {
       cameraController.stop();
     } else {

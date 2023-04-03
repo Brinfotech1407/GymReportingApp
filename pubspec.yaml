@@ -53,6 +53,7 @@ dependencies:
   quickalert: ^1.0.1
   mobile_scanner: ^3.0.0
   fluttertoast: ^8.2.1
+  awesome_notifications: ^0.7.4+1
 
 
 dev_dependencies:

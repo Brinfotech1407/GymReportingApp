@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/auth/registration.dart';
@@ -114,23 +116,29 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   hintText: 'Enter your password...'),
               //passwordFormFiledView(),
-              GymUtils().buildButtonView(
-                  context: context,
-                  onSubmitBtnTap: () async {
-                    isLoaded.toggle();
-                    if (_emailController.text.isNotEmpty &&
-                        _pwdController.text.isNotEmpty) {
-                      if (isLoaded.value == true) {
-                        const LoaderScreen(
-                          isFullScreen: false,
-                        );
-                      }
-                      isLoaded.value = false;
-                      await AuthController.instance.loginUser(
-                          _emailController.text, _pwdController.text, context);
-                    }
-                  },
-                  buttonName: 'Login'),
+      GymUtils().buildButtonView(
+          context: context,
+          onSubmitBtnTap: () async {
+            if (_emailController.text.isNotEmpty &&
+                _pwdController.text.isNotEmpty) {
+              delayButtonEnabled();
+              await AuthController.instance.loginUser(
+                  _emailController.text, _pwdController.text, context);
+            }
+            //toggle is used to true value convert into false and false is true
+            //isLoaded.toggle();
+
+          },
+          buttonName: 'Login'),
+
+              if(isLoaded.isTrue) ...[
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: LoaderScreen(
+                    isFullScreen: false,
+                  ),
+                ),
+              ],
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -158,4 +166,14 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+
+  void delayButtonEnabled() {
+    Future.delayed(Duration(seconds: 5), () {
+      setState(() {
+        isLoaded.value =true;
+      });
+    });
+  }
+
+
 }

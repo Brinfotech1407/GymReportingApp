@@ -10,6 +10,6 @@ class LoaderScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return isFullScreen
         ? const SplashScreen()
-        : const Center(child: CircularProgressIndicator(color: Colors.grey));
+        : const CircularProgressIndicator(color: Colors.green);
   }
 }

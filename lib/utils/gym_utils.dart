@@ -210,4 +210,18 @@ class GymUtils {
     );
 
   }
+
+  showCircularBar(){
+    return Center(
+        child: Transform.scale(
+          scale: 2,
+          child: Container(
+            margin: const EdgeInsets.only(top: 18),
+            child: const CircularProgressIndicator(
+              backgroundColor: Colors.white,
+              color: Colors.green,
+            ),
+          ),
+        ));
+  }
 }

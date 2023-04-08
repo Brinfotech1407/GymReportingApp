@@ -1,12 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gim_app/auth/registration.dart';
 import 'package:gim_app/controllers/auth_controller.dart';
-import 'package:gim_app/controllers/loging_controller.dart';
+import 'package:gim_app/controllers/loading_controller.dart';
 import 'package:gim_app/utils/gym_utils.dart';
-import 'package:gim_app/waiting/LoaderScreen.dart';
 
 class LoginScreen extends StatefulWidget {
   final String? ownerID;
@@ -20,9 +17,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
-  final LoginController loginController = Get.put(LoginController());
-
-  // RxBool isLoaded = false.obs;
+  final LoadingController loginController = Get.put(LoadingController());
 
   @override
   void initState() {
@@ -36,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Container(
           decoration: GymUtils().buildBoxDecoration(),
           child: Obx(() {
-              return buildLoginView(context);
+            return buildLoginView(context);
           }),
         ),
       ),
@@ -44,19 +39,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget buildLoginView(BuildContext context) {
-    return Stack(
-      alignment: Alignment.center,
-        children: [
-          if(loginController.isLoading.value)...[
-            const Center(child: CircularProgressIndicator(color: Colors.white,backgroundColor: Colors.grey,))
-          ]else...[
-            bulidLogin(context),
-          ]
-        ],
-    );
+    return showLoginView(context);
   }
 
-  Column bulidLogin(BuildContext context) {
+  Column showLoginView(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -139,46 +125,49 @@ class _LoginScreenState extends State<LoginScreen> {
               }
             },
             hintText: 'Enter your password...'),
-        //passwordFormFiledView(),
-        GymUtils().buildButtonView(
-            context: context,
-            onSubmitBtnTap: () async {
-              if (_emailController.text.isNotEmpty &&
-                  _pwdController.text.isNotEmpty) {
-                loginController.checkLoginStatus(
-                    emailControllerValue: _emailController.text,
-                    passwordControllerValue: _pwdController.text);
-                // GymUtils().delayButtonEnabled(isLoaded);
-                await AuthController.instance.loginUser(
-                    _emailController.text, _pwdController.text, context);
-                // isLoaded.value = false;
-              }
+        if (loginController.isLoading.value) ...[
+           GymUtils().showCircularBar(),
+        ] else ...[
+          GymUtils().buildButtonView(
+              context: context,
+              onSubmitBtnTap: () async {
+                if (_emailController.text.isNotEmpty &&
+                    _pwdController.text.isNotEmpty) {
+                  loginController.checkLoginStatus(
+                      emailControllerValue: _emailController.text,
+                      passwordControllerValue: _pwdController.text,
+                      context: context);
+                  await AuthController.instance.loginUser(
+                      _emailController.text, _pwdController.text, context);
+                }
 
-              //toggle is used to true value convert into false and false is true
-              //isLoaded.toggle();
-            },
-            buttonName: 'Login'),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                "Don't have an account yet? ",
-                style: TextStyle(color: Colors.white),
-              ),
-              InkWell(
-                onTap: () {
-                  Get.to(() => const RegistrationScreen());
-                },
-                child: const Text(
-                  "Register",
-                  style: TextStyle(color: Colors.green),
+                //toggle is used to true value convert into false and false is true
+                //isLoaded.toggle();
+              },
+              buttonName: 'Login'),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Don't have an account yet? ",
+                  style: TextStyle(color: Colors.white),
                 ),
-              ),
-            ],
+                InkWell(
+                  onTap: () {
+                    Get.to(() => const RegistrationScreen());
+                  },
+                  child: const Text(
+                    "Register",
+                    style: TextStyle(color: Colors.green),
+                  ),
+                ),
+              ],
+            ),
           ),
-        )
+        ],
+
       ],
     );
   }

@@ -8,13 +8,13 @@ class LoadingController extends GetxController {
   var isLoggedIn = false.obs;
 
 
-  void checkLoginStatus(
-      {required String emailControllerValue, required String passwordControllerValue,required BuildContext context}) async {
+   checkLoginStatus(
+      {required bool isAllDetailsFilled,required BuildContext context}) async {
     isLoading.value = true;
     await Future.delayed(const Duration(seconds: 2));
-    isLoading.value = false;
 
-    if (emailControllerValue.trim().isNotEmpty && passwordControllerValue.trim().isNotEmpty) {
+
+    if (isAllDetailsFilled) {
       isLoggedIn.value = true;
     } else {
       // ignore: use_build_context_synchronously

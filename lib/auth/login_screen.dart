@@ -17,7 +17,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
-  final LoadingController loginController = Get.put(LoadingController());
+  final LoadingController loadingController = Get.put(LoadingController());
 
   @override
   void initState() {
@@ -125,50 +125,54 @@ class _LoginScreenState extends State<LoginScreen> {
               }
             },
             hintText: 'Enter your password...'),
-        if (loginController.isLoading.value) ...[
-           GymUtils().showCircularBar(),
-        ] else ...[
-          GymUtils().buildButtonView(
-              context: context,
-              onSubmitBtnTap: () async {
-                if (_emailController.text.isNotEmpty &&
-                    _pwdController.text.isNotEmpty) {
-                  loginController.checkLoginStatus(
-                      emailControllerValue: _emailController.text,
-                      passwordControllerValue: _pwdController.text,
-                      context: context);
-                  await AuthController.instance.loginUser(
-                      _emailController.text, _pwdController.text, context);
-                }
+        if (loadingController.isLoading.value) ...[
+          GymUtils().showCircularBar(),
+        ] else
+          ...[
+            GymUtils().buildButtonView(
+                context: context,
+                onSubmitBtnTap: () async {
+                  if (isFiledAllDetails()) {
+                    loadingController.checkLoginStatus(
+                        isAllDetailsFilled:isFiledAllDetails(),
+                        context: context);
+                    await AuthController.instance.loginUser(
+                        _emailController.text, _pwdController.text, context);
+                    loadingController.isLoading.value = false;
+                  }
 
-                //toggle is used to true value convert into false and false is true
-                //isLoaded.toggle();
-              },
-              buttonName: 'Login'),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  "Don't have an account yet? ",
-                  style: TextStyle(color: Colors.white),
-                ),
-                InkWell(
-                  onTap: () {
-                    Get.to(() => const RegistrationScreen());
-                  },
-                  child: const Text(
-                    "Register",
-                    style: TextStyle(color: Colors.green),
+                  //toggle is used to truisFiledAllDetails
+                },
+                buttonName: 'Login'),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Don't have an account yet? ",
+                    style: TextStyle(color: Colors.white),
                   ),
-                ),
-              ],
+                  InkWell(
+                    onTap: () {
+                      Get.to(() => const RegistrationScreen());
+                    },
+                    child: const Text(
+                      "Register",
+                      style: TextStyle(color: Colors.green),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
 
       ],
     );
+  }
+
+  bool isFiledAllDetails() {
+    return _emailController.text.isNotEmpty &&
+        _pwdController.text.isNotEmpty;
   }
 }
